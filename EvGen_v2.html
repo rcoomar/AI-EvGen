@@ -1,0 +1,3419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EvGen Studio</title>
+  <style>
+    :root {
+      --primary: #c624b9;
+      --primary-dark: #a81f9f;
+      --page-bg: #fafafa;
+      --text: #353535;
+      --muted: #757575;
+      --line: #e8e8ee;
+      --brand-blue: #0d778f;
+      --ta-pill: #d7f0f5;
+      --draft-line: #c624b9;
+      --approved-line: #20a39e;
+      --refresh-line: #f39c3d;
+      --ai: #c624b9;
+      --e360: #0d778f;
+      --good: #2f9a6d;
+      --warn: #d49a24;
+      --danger: #b74e6b;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 18px 36px rgba(0,0,0,0.12);
+      --font-xs: 11px;
+      --font-sm: 12px;
+      --font-md: 13px;
+      --font-lg: 15px;
+      --font-xl: 18px;
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--page-bg);
+      color: var(--text);
+      font-size: var(--font-md);
+    }
+    button, input, select, textarea { font-family: inherit; }
+    a { color: inherit; text-decoration: none; }
+    .hidden { display: none !important; }
+
+    /* HEADER */
+    .topbar {
+      min-height: 78px;
+      background: #fff;
+      border-bottom: 3px solid var(--primary);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 16px;
+      align-items: center;
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      justify-self: start;
+    }
+    .brand-logo {
+      height: 34px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+    .brand-text {
+      font-size: 17px;
+      font-weight: 700;
+      color: #5d5656;
+      white-space: nowrap;
+    }
+    .center-title {
+      justify-self: center;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary);
+      white-space: nowrap;
+    }
+    .center-title span {
+      color: #4a4a4a;
+      font-weight: 700;
+    }
+    .header-right {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      min-width: 0;
+    }
+    .asset-pill {
+      border: 1px solid #ead6e8;
+      background: #fffafd;
+      color: var(--primary);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: var(--font-sm);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .add-btn {
+      border: 1.8px solid var(--primary);
+      background: #fff;
+      color: var(--primary);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: var(--font-md);
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .add-btn:hover { background: #fff7fe; }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      border-radius: 999px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .profile-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #d97cd4, #8dcbda);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: var(--font-md);
+      flex-shrink: 0;
+    }
+    .profile-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #444;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .profile-role {
+      font-size: var(--font-sm);
+      color: var(--muted);
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    .page {
+      max-width: 1640px;
+      margin: 0 auto;
+      padding: 20px 24px 40px;
+      display: none;
+    }
+    .page.active { display: block; }
+
+    /* LANDING */
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .left-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-box, .search-box {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+    }
+    .filter-box select,
+    .search-box input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: var(--font-md);
+      color: #555;
+    }
+    .filter-box select { font-weight: 700; }
+    .search-box {
+      width: 370px;
+      gap: 8px;
+    }
+    .legend {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: #666;
+      font-size: var(--font-sm);
+      font-weight: 700;
+    }
+    .legend-item {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+    }
+    .legend-line {
+      width: 18px;
+      height: 4px;
+      border-radius: 999px;
+    }
+
+    .swimlanes {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .lane {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .lane-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lane-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .lane-marker {
+      width: 6px;
+      height: 24px;
+      border-radius: 999px;
+    }
+    .lane[data-lane="drafts"] .lane-marker { background: var(--draft-line); }
+    .lane[data-lane="approved"] .lane-marker { background: var(--approved-line); }
+    .lane[data-lane="refresh"] .lane-marker { background: var(--refresh-line); }
+    .lane-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #414141;
+    }
+    .lane-subtitle {
+      font-size: var(--font-sm);
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .lane-count {
+      min-width: 32px;
+      height: 32px;
+      background: #f2f2f5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-sm);
+      font-weight: 800;
+      color: #666;
+    }
+    .lane-content {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .asset-card {
+      position: relative;
+      min-width: 330px;
+      max-width: 330px;
+      background: #fff;
+      border: 1px solid #ebebf0;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 16px 16px 14px 20px;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+    .asset-card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      border-radius: 18px 0 0 18px;
+    }
+    .asset-card.drafts::before { background: var(--draft-line); }
+    .asset-card.approved::before { background: var(--approved-line); }
+    .asset-card.refresh::before { background: var(--refresh-line); }
+    .asset-card.clickable {
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .asset-card.clickable:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .asset-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--brand-blue);
+      margin-bottom: 7px;
+      line-height: 1.15;
+    }
+    .ta-pill {
+      display: inline-flex;
+      align-items: center;
+      background: var(--ta-pill);
+      color: #1a7d90;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: var(--font-sm);
+      font-weight: 800;
+    }
+    .plan-tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      margin-top: 7px;
+    }
+    .plan-tag.refresh {
+      background: #fff3e6;
+      color: #c26d00;
+    }
+    .plan-tag.active {
+      background: #fde9fb;
+      color: var(--primary);
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    .tag.new { background: #ffe7fb; color: var(--primary); }
+    .tag.approved { background: #dcf7ef; color: #108565; }
+
+    .card-body {
+      background: #fff;
+      border: 1px solid #f0f0f4;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .card-section-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: #989898;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      margin-bottom: 7px;
+    }
+    .moa-text {
+      font-size: var(--font-md);
+      line-height: 1.45;
+      color: #333;
+      font-weight: 700;
+    }
+    .card-meta {
+      display: grid;
+      gap: 8px;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: var(--font-sm);
+      align-items: center;
+    }
+    .meta-label { color: #8e8e8e; font-weight: 700; }
+    .meta-value { color: #333; font-weight: 800; text-align: right; }
+
+    /* NAV BAR */
+    .module-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: linear-gradient(90deg, #fff5ff 0%, #f5fbff 100%);
+      border: 1px solid #eed9ec;
+      border-radius: 20px;
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .module-nav-item {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: rgba(255,255,255,0.75);
+      color: #575050;
+      font-size: var(--font-sm);
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .module-nav-item.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 8px 16px rgba(198,36,185,0.2);
+    }
+    .module-nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: #5d5656;
+      font-size: var(--font-sm);
+      font-weight: 800;
+    }
+    .outline-btn, .solid-btn, .chip-btn {
+      border-radius: 999px;
+      font-size: var(--font-sm);
+      font-weight: 800;
+      cursor: pointer;
+      padding: 9px 13px;
+    }
+    .outline-btn {
+      border: 1.4px solid var(--primary);
+      background: #fff;
+      color: var(--primary);
+    }
+    .solid-btn {
+      border: none;
+      background: var(--primary);
+      color: #fff;
+    }
+    .chip-btn {
+      border: 1px solid #ead6e8;
+      background: #fffafd;
+      color: var(--primary);
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: #5f5656;
+      font-size: var(--font-sm);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .breadcrumb .active {
+      color: var(--primary);
+      font-weight: 800;
+    }
+    .title-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* SUMMARY */
+    .summary-header {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+    .summary-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #2d2d2d;
+      margin-bottom: 14px;
+    }
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .stat-card {
+      border: 2px solid #1d3944;
+      border-radius: 18px;
+      padding: 14px 12px;
+      background: #fff;
+      min-height: 96px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      gap: 6px;
+    }
+    .stat-label {
+      font-size: var(--font-md);
+      font-weight: 700;
+      color: #4c4c4c;
+      line-height: 1.25;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: #173746;
+    }
+    .inline-badges {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .small-badge {
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .badge-ai { background: #fde9fb; color: var(--ai); }
+    .badge-e360 { background: #e9f7fb; color: var(--e360); }
+
+    .exec-modules {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .module-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+    .module-card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .module-title h3 {
+      margin: 0 0 5px;
+      font-size: 20px;
+      color: #212121;
+      line-height: 1.1;
+      font-weight: 800;
+    }
+    .module-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--font-sm);
+      font-weight: 700;
+    }
+    .module-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 16px;
+    }
+    .content-panel {
+      background: #fff;
+      border: 1px solid #f0eef3;
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .section-head {
+      background: #f8f4f4;
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: var(--font-md);
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: #5f2f2f;
+    }
+    .bullet-list {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+      font-size: var(--font-md);
+      line-height: 1.45;
+    }
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(90px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .metric-mini {
+      background: #f7f3f3;
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+    .metric-mini .num {
+      font-size: 24px;
+      font-weight: 800;
+      color: #7b2e2e;
+    }
+    .metric-mini .txt {
+      font-size: var(--font-sm);
+      line-height: 1.3;
+      color: #6a3f3f;
+      font-weight: 700;
+    }
+    .mini-kpi {
+      border: 1px solid #ece8ee;
+      border-radius: 14px;
+      padding: 13px;
+      background: #fff;
+      margin-bottom: 10px;
+    }
+    .mini-kpi h4 {
+      margin: 0 0 8px;
+      font-size: var(--font-md);
+      color: #4f4f4f;
+    }
+
+    /* SHARED MODULE LAYOUT */
+    .subshell {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 18px;
+    }
+    .sidebar {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      height: fit-content;
+      box-shadow: var(--shadow);
+    }
+    .sidebar-header {
+      padding: 14px;
+      font-size: var(--font-sm);
+      font-weight: 800;
+      color: var(--primary);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sidebar-link {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f2f2f6;
+      cursor: pointer;
+      font-weight: 700;
+      color: #555;
+      font-size: var(--font-md);
+    }
+    .sidebar-link.active {
+      background: linear-gradient(90deg, var(--primary) 0%, #d55cd0 100%);
+      color: #fff;
+    }
+    .content-shell {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .page-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .page-head h2 {
+      margin: 0;
+      font-size: 26px;
+      color: #424242;
+      line-height: 1.1;
+    }
+    .page-head h2 span { color: var(--primary); }
+    .page-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .toolbar-select {
+      border: 1px solid #eadfea;
+      background: #fff;
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: var(--font-sm);
+      font-weight: 700;
+      color: #5a5555;
+    }
+    .toolbar-select select {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: var(--font-sm);
+      font-weight: 700;
+      color: #5a5555;
+    }
+
+    .section-title {
+      font-size: 16px;
+      color: var(--primary);
+      font-weight: 800;
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      margin: 6px 0 16px;
+    }
+    .section-title::before {
+      content: "";
+      width: 4px;
+      height: 20px;
+      border-radius: 999px;
+      background: #555;
+    }
+
+    /* COMP */
+    .comp-grid {
+      display: grid;
+      grid-template-columns: 180px repeat(4, minmax(190px, 1fr));
+      gap: 14px;
+      overflow-x: auto;
+    }
+    .param-col, .comp-card {
+      border: 1px solid #d9d4d9;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .param-col .head, .comp-card .head {
+      padding: 12px;
+      text-align: center;
+      font-size: var(--font-md);
+      font-weight: 800;
+      background: #f4f2f4;
+    }
+    .comp-card.highlight {
+      border: 2px solid var(--primary);
+      box-shadow: 0 10px 24px rgba(198,36,185,0.12);
+    }
+    .comp-card.highlight .head {
+      background: linear-gradient(90deg, var(--primary) 0%, #c53eb8 100%);
+      color: #fff;
+    }
+    .param-cell, .comp-cell {
+      min-height: 48px;
+      padding: 12px 10px;
+      border-top: 1px solid #efecf0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: var(--font-sm);
+      line-height: 1.35;
+      font-weight: 700;
+    }
+    .param-col .param-cell {
+      background: #5f595a;
+      color: #fff;
+    }
+    .comp-card.highlight .comp-cell { color: #9d1798; }
+
+    /* GENERIC MODULE */
+    .detail-section {
+      margin-bottom: 18px;
+    }
+    .detail-box {
+      border: 1px solid #efedf2;
+      border-radius: 16px;
+      background: #fff;
+      padding: 14px;
+    }
+
+    /* GAP */
+    .group-line {
+      margin: 18px 0 12px;
+      text-align: center;
+      position: relative;
+      font-size: 15px;
+      font-weight: 800;
+      color: #741574;
+    }
+    .group-line::before {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; top: 50%;
+      border-top: 2px dotted #e6a4e1;
+      z-index: 0;
+    }
+    .group-line span {
+      position: relative;
+      z-index: 1;
+      background: #fff;
+      padding: 0 14px;
+    }
+    .collapse-toggle {
+      margin-left: 8px;
+      font-size: 12px;
+      color: #555;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .si-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .si-card {
+      border: 1px solid #b7c2cb;
+      border-radius: 16px;
+      background: #f7fafc;
+      padding: 16px;
+      min-height: 92px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    .si-id {
+      color: #741474;
+      font-size: 16px;
+      font-weight: 800;
+      min-width: 38px;
+    }
+    .si-text {
+      font-size: var(--font-md);
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .ego-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .ego-card {
+      border: 2px solid #ef88e7;
+      border-radius: 22px;
+      background: #fff;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .ego-card:hover { transform: translateY(-1px); }
+    .ego-card.active {
+      box-shadow: 0 10px 24px rgba(198,36,185,0.12);
+      border-color: var(--primary);
+    }
+    .ego-top {
+      padding: 12px;
+      text-align: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: #b826b2;
+      background: #fff;
+    }
+    .ego-body {
+      border-top: 1px solid #f4e9f4;
+      padding: 14px;
+      min-height: 220px;
+    }
+    .ego-body h4 {
+      margin: 0 0 10px;
+      text-align: center;
+      font-size: 15px;
+      color: #4d4d4d;
+      line-height: 1.25;
+    }
+
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(170px, 1fr));
+      gap: 12px;
+    }
+    .map-card {
+      border: 1px solid #e8d4e8;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      position: relative;
+    }
+    .map-card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: #7dd9ac;
+    }
+    .map-card.medium::before { background: #eccd8a; }
+    .map-card.high::before { background: #7dd9ac; }
+    .map-head {
+      min-height: 78px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: var(--font-md);
+      font-weight: 700;
+      color: #4b4b4b;
+      background: #fbfbfb;
+    }
+    .map-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      border-top: 1px solid #f0edf0;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .map-status.partial { color: #cb8cc4; }
+    .map-status.not { color: var(--primary); }
+    .map-status.full { color: #92358a; }
+    .map-priority.high { color: var(--good); }
+    .map-priority.medium { color: var(--warn); }
+
+    .add-gap-panel {
+      margin-top: 16px;
+      border: 1px solid #eadfea;
+      border-radius: 16px;
+      background: #fff;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .add-gap-panel h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      color: #3a3a3a;
+    }
+    .add-gap-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr .8fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .add-gap-grid input,
+    .add-gap-grid select,
+    .add-gap-panel textarea {
+      width: 100%;
+      border: 1px solid #e2dfe5;
+      border-radius: 12px;
+      background: #fbfbfc;
+      padding: 10px 12px;
+      outline: none;
+      font-size: var(--font-sm);
+    }
+    .add-gap-panel textarea {
+      min-height: 90px;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+
+    /* REVIEW TABLE */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid #dde2eb;
+      border-radius: 14px;
+      background: #fff;
+    }
+    table.review-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1450px;
+      font-size: 12px;
+    }
+    .review-table th,
+    .review-table td {
+      border: 1px solid #cfd6df;
+      padding: 10px 8px;
+      vertical-align: top;
+      line-height: 1.35;
+    }
+    .review-table th {
+      background: #edf2f8;
+      font-size: 12px;
+      font-weight: 800;
+      color: #222;
+      text-align: center;
+    }
+    .review-table td {
+      background: #fff;
+      color: #3c3c3c;
+    }
+    .review-table .center { text-align: center; }
+    .source-badge {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .src-ai { background: #fde9fb; color: var(--ai); }
+    .src-e360 { background: #e9f7fb; color: var(--e360); }
+    .evidence-pill {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 800;
+      background: #fff8df;
+      color: #9b7100;
+      white-space: nowrap;
+    }
+    .module-link {
+      color: var(--primary);
+      font-weight: 800;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .icon-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .icon-decision {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid #e4dfe5;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-decision.approve.active {
+      background: #e9faef;
+      border-color: #9eddba;
+      color: var(--good);
+    }
+    .icon-decision.decline.active {
+      background: #fff1f5;
+      border-color: #efc3d1;
+      color: var(--danger);
+    }
+    .icon-decision.unclear.active {
+      background: #fff9ee;
+      border-color: #edd79e;
+      color: var(--warn);
+    }
+    .decision-output {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    /* MODAL / TOAST */
+    .overlay, .toast-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.24);
+      z-index: 999;
+      padding: 20px;
+    }
+    .overlay.active, .toast-overlay.active { display: flex; }
+    .modal, .toast-card {
+      width: 100%;
+      max-width: 500px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      padding: 24px;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #444;
+    }
+    .close-btn {
+      border: none;
+      background: transparent;
+      font-size: 26px;
+      color: #999;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-copy {
+      color: #666;
+      line-height: 1.45;
+      margin-bottom: 16px;
+      font-size: var(--font-md);
+    }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      margin-bottom: 7px;
+      color: #666;
+      font-weight: 800;
+      font-size: var(--font-sm);
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid #e4e4e8;
+      background: #fbfbfc;
+      padding: 0 12px;
+      outline: none;
+      font-size: var(--font-md);
+    }
+    .upload-box {
+      border: 1.5px dashed #d6c3d4;
+      background: #fcf8fc;
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 11px 16px;
+      font-size: var(--font-md);
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn.secondary { background: #efeff2; color: #666; }
+    .btn.primary { background: var(--primary); color: #fff; }
+
+    .toast-card {
+      text-align: center;
+      max-width: 500px;
+    }
+    .toast-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #e8fbf2;
+      color: #18a36d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 24px;
+      font-weight: 900;
+    }
+    .toast-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #444;
+      margin-bottom: 10px;
+    }
+    .toast-copy {
+      color: #666;
+      font-size: var(--font-md);
+      line-height: 1.55;
+      margin-bottom: 16px;
+    }
+
+    /* CHAT */
+    .chat-fab {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 1200;
+      background: #fff;
+      border: 1px solid #f0d7ef;
+      border-radius: 999px;
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.14);
+      padding: 10px 16px 10px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      min-height: 68px;
+    }
+    .chat-fab img {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: #fff;
+    }
+    .chat-fab-title {
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .chat-fab-sub {
+      color: #888;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+
+    .chat-window {
+      position: fixed;
+      right: 22px;
+      bottom: 98px;
+      width: 390px;
+      max-width: calc(100vw - 30px);
+      height: 560px;
+      background: #fff;
+      border: 1px solid #edd7eb;
+      border-radius: 22px;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.16);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1300;
+    }
+    .chat-window.open { display: flex; }
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid #f0e5ef;
+      background: #fff;
+    }
+    .chat-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chat-header img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: #fff;
+    }
+    .chat-title {
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .chat-status {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .chat-header-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .chat-icon-btn,
+    .chat-close {
+      border: none;
+      background: transparent;
+      color: #999;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .chat-icon-btn:hover,
+    .chat-close:hover {
+      background: #f6f2f6;
+      color: #666;
+    }
+
+    .quick-replies {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 10px 12px 8px;
+      background: #fff;
+      border-bottom: 1px solid #f5ebf4;
+    }
+    .quick-reply, .module-suggest {
+      border: 1px solid #edd7eb;
+      background: #fffafd;
+      color: var(--primary);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 14px;
+      overflow-y: auto;
+      background: linear-gradient(180deg, #fff 0%, #fffafd 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .chat-message {
+      max-width: 85%;
+      padding: 11px 12px;
+      border-radius: 16px;
+      font-size: var(--font-sm);
+      line-height: 1.45;
+      word-wrap: break-word;
+    }
+    .chat-message.bot {
+      align-self: flex-start;
+      background: #f8edf7;
+      color: #4a4a4a;
+      border-bottom-left-radius: 6px;
+    }
+    .chat-message.user {
+      align-self: flex-end;
+      background: var(--primary);
+      color: #fff;
+      border-bottom-right-radius: 6px;
+    }
+    .module-suggestions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .typing-row {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 0 14px 10px;
+      background: linear-gradient(180deg, #fff 0%, #fffafd 100%);
+    }
+    .typing-row.active { display: flex; }
+    .typing-bubble {
+      display: inline-flex;
+      gap: 5px;
+      background: #f8edf7;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border-bottom-left-radius: 6px;
+    }
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #c28dbe;
+      animation: blink 1.2s infinite ease-in-out;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes blink {
+      0%,80%,100% { opacity: .3; transform: scale(.9); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+    .chat-input-area {
+      border-top: 1px solid #f0e5ef;
+      padding: 10px;
+      background: #fff;
+    }
+    .chat-input-wrap {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: #faf7fa;
+      border: 1px solid #ebdfeb;
+      border-radius: 999px;
+      padding: 7px 7px 7px 12px;
+    }
+    .chat-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: var(--font-sm);
+      color: #444;
+    }
+    .chat-send {
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: var(--font-sm);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    @media (max-width: 1280px) {
+      .summary-stats { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+      .module-grid,
+      .subshell { grid-template-columns: 1fr; }
+      .ego-grid,
+      .map-grid,
+      .si-row,
+      .add-gap-grid { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+    }
+
+    @media (max-width: 980px) {
+      .topbar {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+          "brand profile"
+          "title title";
+        row-gap: 12px;
+      }
+      .brand { grid-area: brand; }
+      .center-title {
+        grid-area: title;
+        justify-self: start;
+      }
+      .header-right {
+        grid-area: profile;
+        justify-self: end;
+      }
+      .summary-stats { grid-template-columns: 1fr; }
+      .ego-grid,
+      .map-grid,
+      .si-row,
+      .add-gap-grid { grid-template-columns: 1fr; }
+      .comp-grid { grid-template-columns: 170px repeat(4, minmax(180px, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .page { padding: 16px; }
+      .search-box { width: 100%; }
+      .asset-card { min-width: 290px; max-width: 290px; }
+      .chat-fab { right: 14px; bottom: 14px; }
+      .chat-window {
+        right: 14px;
+        bottom: 88px;
+        width: calc(100vw - 28px);
+        height: 70vh;
+      }
+      .topbar {
+        padding: 12px 16px;
+      }
+      .brand-text {
+        font-size: 15px;
+      }
+      .center-title {
+        font-size: 21px;
+      }
+      .header-right {
+        gap: 8px;
+      }
+      .add-btn {
+        padding: 9px 12px;
+        font-size: 12px;
+      }
+      .profile {
+        padding: 7px 9px;
+      }
+      .profile-avatar {
+        width: 34px;
+        height: 34px;
+      }
+      .profile-name {
+        font-size: 13px;
+      }
+      .profile-role {
+        font-size: 11px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "profile"
+          "brand"
+          "title";
+        justify-items: stretch;
+      }
+      .header-right {
+        justify-self: end;
+      }
+      .brand {
+        justify-self: start;
+      }
+      .center-title {
+        justify-self: start;
+      }
+      .add-btn {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-logo" src="bms-logo.png" alt="BMS logo" />
+      <div class="brand-text" id="brandText">Bristol Myers Squibb</div>
+    </div>
+
+    <div class="center-title" id="centerTitle"><span>EvGen</span> Studio</div>
+
+    <div class="header-right">
+      <button class="add-btn" id="openModalBtn">Add New Asset</button>
+      <div class="profile">
+        <div class="profile-avatar">AS</div>
+        <div>
+          <div class="profile-name" id="profileName">Ava Sharma</div>
+          <div class="profile-role">Portfolio Strategy Lead</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- LANDING -->
+  <section class="page active" id="landingScreen">
+    <section class="controls">
+      <div class="left-controls">
+        <div class="filter-box">
+          <select id="taFilter">
+            <option value="All">All Therapeutic Areas</option>
+            <option value="Oncology">Oncology</option>
+            <option value="Hematology">Hematology</option>
+            <option value="Cardiovascular">Cardiovascular</option>
+          </select>
+        </div>
+
+        <div class="search-box">
+          <span>⌕</span>
+          <input id="searchInput" type="text" placeholder="Search by asset name, MoA, or therapeutic area" />
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><div class="legend-line" style="background: var(--draft-line);"></div><span>Active Drafts</span></div>
+        <div class="legend-item"><div class="legend-line" style="background: var(--approved-line);"></div><span>Approved Plans</span></div>
+        <div class="legend-item"><div class="legend-line" style="background: var(--refresh-line);"></div><span>Refresh Plan</span></div>
+      </div>
+    </section>
+
+    <section class="swimlanes">
+      <div class="lane" data-lane="drafts">
+        <div class="lane-header">
+          <div class="lane-title-wrap">
+            <div class="lane-marker"></div>
+            <div>
+              <div class="lane-title">Active Drafts</div>
+              <div class="lane-subtitle">Assets currently in development or under review</div>
+            </div>
+          </div>
+          <div class="lane-count" id="count-drafts">0</div>
+        </div>
+        <div class="lane-content" id="draftsLane"></div>
+      </div>
+
+      <div class="lane" data-lane="approved">
+        <div class="lane-header">
+          <div class="lane-title-wrap">
+            <div class="lane-marker"></div>
+            <div>
+              <div class="lane-title">Approved Plans</div>
+              <div class="lane-subtitle">Finalized assets, arranged alphabetically</div>
+            </div>
+          </div>
+          <div class="lane-count" id="count-approved">0</div>
+        </div>
+        <div class="lane-content" id="approvedLane"></div>
+      </div>
+
+      <div class="lane" data-lane="refresh">
+        <div class="lane-header">
+          <div class="lane-title-wrap">
+            <div class="lane-marker"></div>
+            <div>
+              <div class="lane-title">Refresh Plan</div>
+              <div class="lane-subtitle">Assets due for refresh and insight review</div>
+            </div>
+          </div>
+          <div class="lane-count" id="count-refresh">0</div>
+        </div>
+        <div class="lane-content" id="refreshLane"></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- EXEC SUMMARY -->
+  <section class="page" id="summaryScreen">
+    <div class="breadcrumb title-stack">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span>Home</span>
+        <span>›</span>
+        <span id="crumbAssetName">Abecma</span>
+        <span>›</span>
+        <span class="active">Executive Summary</span>
+      </div>
+      <div id="summaryPlanTag"></div>
+    </div>
+
+    <div class="module-nav">
+      <button class="module-nav-item active" data-nav="summary">Executive Summary</button>
+      <button class="module-nav-item" data-nav="gap">Gap Identification & Prioritization</button>
+      <button class="module-nav-item" data-nav="landscape">Disease & Treatment Landscape</button>
+      <button class="module-nav-item" data-nav="competitive">Competitive Benchmark</button>
+      <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
+      <div class="module-nav-right">
+        <span>Last Updated: 02/03/2026</span>
+        <button class="outline-btn" id="backToAssetsBtn">Back to Assets</button>
+      </div>
+    </div>
+
+    <div class="summary-header">
+      <div class="summary-title">What’s new since last review:</div>
+      <div class="summary-stats">
+        <div class="stat-card">
+          <div class="stat-label">Total Gaps | Unaddressed</div>
+          <div class="stat-value">11</div>
+          <div class="inline-badges">
+            <span class="small-badge badge-ai">AI: 6</span>
+            <span class="small-badge badge-e360">E360: 5</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Priority Gaps</div>
+          <div class="stat-value">4</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"># Key Competitors</div>
+          <div class="stat-value">5</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Next Milestone</div>
+          <div class="stat-value" style="font-size:18px;">03/12/2026</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Top Risk</div>
+          <div class="stat-value" style="font-size:18px;">Enrollment</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exec-modules">
+      <div class="module-card">
+        <div class="module-card-header">
+          <div class="module-title">
+            <h3>1) Gap Identification & Prioritization</h3>
+            <p>Key unresolved medical questions, inactive workstreams, and partially addressed gaps.</p>
+          </div>
+          <button class="solid-btn deep-dive-btn" data-module="gap">Deep Dive →</button>
+        </div>
+
+        <div class="module-grid">
+          <div class="content-panel">
+            <div class="section-head">Nature of Unresolved Medical Questions</div>
+            <ul class="bullet-list">
+              <li>Across lung and breast cancers, the dominant uncertainties center on how to position abecma-based regimens across the continuum—monotherapy versus combinations, induction/neoadjuvant, maintenance, and perioperative relative to current standards.</li>
+              <li>Biomarker segmentation remains insufficiently defined, including PD-L1/CPS strata, STK11/KEAP1, ER/HER2-low, and outcomes in high-risk special populations such as brain or liver metastases, poor performance status, and bleeding risk.</li>
+              <li>Novel ADC or bispecific combinations still lack comparative safety-efficacy profiles, constraining optimization of multi-agent strategies.</li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="mini-kpi">
+              <h4>Gap mix</h4>
+              <div class="inline-badges" style="justify-content:flex-start;">
+                <span class="small-badge badge-ai">AI-generated: 6</span>
+                <span class="small-badge badge-e360">E360-existing: 5</span>
+              </div>
+            </div>
+            <div class="mini-kpi">
+              <h4>Gaps With No Active Workstream</h4>
+              <ul class="bullet-list">
+                <li>Perioperative sequencing and evidence in special populations remain without active data generation.</li>
+                <li>Evidence remains absent for select special populations and novel combination strategies.</li>
+              </ul>
+            </div>
+            <div class="mini-kpi">
+              <h4>Partially Addressed Gaps</h4>
+              <ul class="bullet-list">
+                <li>Several gaps have new evidence flagged for review.</li>
+                <li>Some may need status changed from Partially Addressed to Addressed.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-card-header">
+          <div class="module-title">
+            <h3>2) Disease & Treatment Landscape</h3>
+            <p>Disease breadth, treatment paradigm fit, and signal concentration drivers.</p>
+          </div>
+          <button class="solid-btn deep-dive-btn" data-module="landscape">Deep Dive →</button>
+        </div>
+
+        <div class="module-grid">
+          <div class="content-panel">
+            <div class="metric-row">
+              <div class="metric-mini">
+                <div class="num">40</div>
+                <div class="txt">tumors being explored</div>
+              </div>
+              <div class="metric-mini">
+                <div class="num">5</div>
+                <div class="txt">CDP tumors</div>
+              </div>
+              <div class="metric-mini">
+                <div class="num">6</div>
+                <div class="txt">non-CDP tumors</div>
+              </div>
+            </div>
+
+            <div class="section-head">Landscape Breadth</div>
+            <ul class="bullet-list">
+              <li>Across solid tumors, the PD-L1 × VEGF concept is being explored where immune exclusion and angiogenic signaling co-dominate the microenvironment.</li>
+              <li>Emerging relevance appears most concentrated in vascularized, myeloid-inflamed settings that historically use checkpoint inhibitors paired with anti-angiogenics.</li>
+            </ul>
+          </div>
+
+          <div class="content-panel">
+            <div class="section-head">Treatment Paradigm Fit</div>
+            <ul class="bullet-list">
+              <li>The asset aligns with practice patterns that pair checkpoint blockade with anti-angiogenic therapy while consolidating dual pathway modulation into a single molecule.</li>
+              <li>It fits best where normalizing vasculature and restoring effector function are jointly sought.</li>
+            </ul>
+
+            <div class="section-head" style="margin-top:12px;">Signal Concentration Drivers</div>
+            <ul class="bullet-list">
+              <li>Promise tends to emerge in immune-excluded, hypoxic tumors with high angiogenesis signatures where VEGF-driven endothelial dysfunction impairs T-cell entry.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-card-header">
+          <div class="module-title">
+            <h3>3) Competitive Benchmarking</h3>
+            <p>Comprehensive competitor overview, comparator assets, and readout structure.</p>
+          </div>
+          <button class="solid-btn deep-dive-btn" data-module="competitive">Deep Dive →</button>
+        </div>
+
+        <div class="module-grid">
+          <div class="content-panel">
+            <div class="section-head">Key benchmark summary</div>
+            <ul class="bullet-list">
+              <li>Abecma’s mechanism and positioning should be benchmarked against direct comparator assets with ongoing programs and overlapping population definitions.</li>
+              <li>Competitive differentiation is likely to depend on biomarker precision, combination safety, and evidence timing.</li>
+            </ul>
+          </div>
+          <div class="content-panel">
+            <div class="section-head">Recommended focus</div>
+            <ul class="bullet-list">
+              <li>Track company, MoA, phase/status, population inclusion/exclusion, endpoints, and duration as the core comparison framework.</li>
+              <li>Use the benchmark to identify where the BMS asset can claim stronger clinical, operational, or scientific differentiation.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-card-header">
+          <div class="module-title">
+            <h3>4) Asset Strategy</h3>
+            <p>Strategic imperatives, EGOs, and underlying key data maps.</p>
+          </div>
+          <button class="solid-btn deep-dive-btn" data-module="strategy">Deep Dive →</button>
+        </div>
+
+        <div class="module-grid">
+          <div class="content-panel">
+            <div class="section-head">Strategic imperatives</div>
+            <ul class="bullet-list">
+              <li>Advance the science in progressive fibrotic lung diseases, including IPF and PPF.</li>
+              <li>Educate the community on the drug pathway and phase 2 results.</li>
+              <li>Engage with external experts and form strong partnerships.</li>
+            </ul>
+          </div>
+          <div class="content-panel">
+            <div class="section-head">Execution focus</div>
+            <ul class="bullet-list">
+              <li>Increase disease awareness, differentiate LPA1 MoA, demonstrate long-term efficacy, establish safety and tolerability, and drive early value.</li>
+              <li>Use key data maps to decide which needs are fully addressed, partially addressed, or not addressed.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPETITIVE -->
+  <section class="page" id="competitiveScreen">
+    <div class="breadcrumb title-stack">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span>Home</span>
+        <span>›</span>
+        <span id="crumbAssetNameCompetitive">Abecma</span>
+        <span>›</span>
+        <span class="active">Competitive Benchmark</span>
+      </div>
+      <div id="competitivePlanTag"></div>
+    </div>
+
+    <div class="module-nav">
+      <button class="module-nav-item" data-nav="summary">Executive Summary</button>
+      <button class="module-nav-item" data-nav="gap">Gap Identification & Prioritization</button>
+      <button class="module-nav-item" data-nav="landscape">Disease & Treatment Landscape</button>
+      <button class="module-nav-item active" data-nav="competitive">Competitive Benchmark</button>
+      <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
+      <div class="module-nav-right">
+        <span>Last Updated: 02/03/2026</span>
+        <button class="outline-btn back-summary-btn">Back to Summary</button>
+      </div>
+    </div>
+
+    <div class="subshell">
+      <div class="sidebar">
+        <div class="sidebar-header">Module Submenu <span>↤</span></div>
+        <div class="sidebar-link active">Comprehensive View</div>
+        <div class="sidebar-link">Competitor Overview</div>
+        <div class="sidebar-link">Trial Snapshots</div>
+        <div class="sidebar-link">Endpoint Coverage</div>
+        <div class="sidebar-link">Publication Heatmap</div>
+        <div class="sidebar-link">Evidence Strength</div>
+      </div>
+
+      <div class="content-shell">
+        <div class="page-head">
+          <h2 id="compTitle">Abecma | <span>Comprehensive View</span></h2>
+          <div class="page-toolbar">
+            <div class="toolbar-select"><select><option>Assets (6)</option></select></div>
+            <div class="toolbar-select"><select><option>Competitor</option></select></div>
+            <div class="toolbar-select"><select><option>Phase</option></select></div>
+            <div class="toolbar-select"><select><option>Region</option></select></div>
+            <div class="toolbar-select"><select><option>Status</option></select></div>
+          </div>
+        </div>
+
+        <div class="section-title">Competitor Overview</div>
+
+        <div class="comp-grid">
+          <div class="param-col">
+            <div class="head">Parameters</div>
+            <div class="param-cell">Company</div>
+            <div class="param-cell">MoA</div>
+            <div class="param-cell">Phase / Status</div>
+            <div class="param-cell">Dose</div>
+            <div class="param-cell">Patient / Target Population</div>
+            <div class="param-cell">Results Available</div>
+            <div class="param-cell">Primary Endpoint</div>
+            <div class="param-cell">Secondary Endpoint</div>
+            <div class="param-cell">Sample Size</div>
+            <div class="param-cell">Study Start Date</div>
+            <div class="param-cell">Duration</div>
+            <div class="param-cell">Geography</div>
+          </div>
+
+          <div class="comp-card highlight">
+            <div class="head">BMS Asset</div>
+            <div class="comp-cell">Bristol Myers Squibb</div>
+            <div class="comp-cell">GLP-1 receptor agonist with SNAC technology</div>
+            <div class="comp-cell">Pre-registration</div>
+            <div class="comp-cell">Once-daily; 25mg</div>
+            <div class="comp-cell">Inclusion: HbA1c 7–10%, BMI ≥25 kg/m²<br/>Exclusion: GI absorption disorders; eGFR &lt;30 mL/min/1.73 m²</div>
+            <div class="comp-cell">Ph III; from IM</div>
+            <div class="comp-cell">Relative change in body weight loss &gt; 10% (n)</div>
+            <div class="comp-cell">Weight loss ≥10%, 15%, 20%, BMI, BP, waist circumference, HbA1c, lipid change, AEs</div>
+            <div class="comp-cell">307</div>
+            <div class="comp-cell">Q4 2024</div>
+            <div class="comp-cell">52 weeks</div>
+            <div class="comp-cell">Global</div>
+          </div>
+
+          <div class="comp-card">
+            <div class="head">Asset 1</div>
+            <div class="comp-cell">Company Name 1</div>
+            <div class="comp-cell">Non-peptide, small molecule, GLP-1 receptor agonist</div>
+            <div class="comp-cell">Ongoing</div>
+            <div class="comp-cell">12mg, 24mg, 36mg, & 45 mg</div>
+            <div class="comp-cell">Inclusion: HbA1c 7–10%, BMI ≥27 kg/m²<br/>Exclusion: eGFR&lt;30; MTC/MEN2 history</div>
+            <div class="comp-cell">Ph II; Obesity</div>
+            <div class="comp-cell">Change in body weight %</div>
+            <div class="comp-cell">Change from baseline in body weight, weight reduction 25%, ≥10%, BMI, waist circumference</div>
+            <div class="comp-cell">272</div>
+            <div class="comp-cell">Q4 2024</div>
+            <div class="comp-cell">52 weeks</div>
+            <div class="comp-cell">Global</div>
+          </div>
+
+          <div class="comp-card">
+            <div class="head">Asset 2</div>
+            <div class="comp-cell">Company Name 1</div>
+            <div class="comp-cell">Non-peptide, small molecule, GLP-1 receptor agonist</div>
+            <div class="comp-cell">Ongoing</div>
+            <div class="comp-cell">12mg, 24mg, 36mg, & 45 mg</div>
+            <div class="comp-cell">Inclusion: HbA1c 7–10%, BMI ≥27 kg/m²<br/>Exclusion: eGFR&lt;30; MTC/MEN2 history</div>
+            <div class="comp-cell">Ph II; Obesity</div>
+            <div class="comp-cell">Change in body weight %</div>
+            <div class="comp-cell">Change from baseline in body weight, weight reduction 25%, ≥10%, BMI, waist circumference</div>
+            <div class="comp-cell">272</div>
+            <div class="comp-cell">Q4 2024</div>
+            <div class="comp-cell">52 weeks</div>
+            <div class="comp-cell">Global</div>
+          </div>
+
+          <div class="comp-card">
+            <div class="head">Asset 3</div>
+            <div class="comp-cell">Company Name 1</div>
+            <div class="comp-cell">Non-peptide, small molecule, GLP-1 receptor agonist</div>
+            <div class="comp-cell">Ongoing</div>
+            <div class="comp-cell">12mg, 24mg, 36mg, & 45 mg</div>
+            <div class="comp-cell">Inclusion: HbA1c 7–10%, BMI ≥27 kg/m²<br/>Exclusion: eGFR&lt;30; MTC/MEN2 history</div>
+            <div class="comp-cell">Ph II; Obesity</div>
+            <div class="comp-cell">Change in body weight %</div>
+            <div class="comp-cell">Change from baseline in body weight, weight reduction 25%, ≥10%, BMI, waist circumference</div>
+            <div class="comp-cell">272</div>
+            <div class="comp-cell">Q4 2024</div>
+            <div class="comp-cell">52 weeks</div>
+            <div class="comp-cell">Global</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GENERIC MODULE DETAIL -->
+  <section class="page" id="detailScreen">
+    <div class="breadcrumb title-stack">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span>Home</span>
+        <span>›</span>
+        <span id="crumbAssetNameDetail">Abecma</span>
+        <span>›</span>
+        <span class="active" id="detailBreadcrumbTitle">Disease & Treatment Landscape</span>
+      </div>
+      <div id="detailPlanTag"></div>
+    </div>
+
+    <div class="module-nav">
+      <button class="module-nav-item" data-nav="summary">Executive Summary</button>
+      <button class="module-nav-item" data-nav="gap">Gap Identification & Prioritization</button>
+      <button class="module-nav-item" data-nav="landscape">Disease & Treatment Landscape</button>
+      <button class="module-nav-item" data-nav="competitive">Competitive Benchmark</button>
+      <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
+      <div class="module-nav-right">
+        <span>Last Updated: 02/03/2026</span>
+        <button class="outline-btn back-summary-btn">Back to Summary</button>
+      </div>
+    </div>
+
+    <div class="content-shell">
+      <div class="page-head">
+        <h2 id="detailTitle">Abecma | <span>Disease & Treatment Landscape</span></h2>
+      </div>
+
+      <div id="detailContent"></div>
+    </div>
+  </section>
+
+  <!-- GAP MODULE -->
+  <section class="page" id="gapScreen">
+    <div class="breadcrumb title-stack">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span>Home</span>
+        <span>›</span>
+        <span id="crumbAssetNameGap">Abecma</span>
+        <span>›</span>
+        <span class="active">Gap Identification & Prioritization</span>
+      </div>
+      <div id="gapPlanTag"></div>
+    </div>
+
+    <div class="module-nav">
+      <button class="module-nav-item" data-nav="summary">Executive Summary</button>
+      <button class="module-nav-item active" data-nav="gap">Gap Identification & Prioritization</button>
+      <button class="module-nav-item" data-nav="landscape">Disease & Treatment Landscape</button>
+      <button class="module-nav-item" data-nav="competitive">Competitive Benchmark</button>
+      <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
+      <div class="module-nav-right">
+        <span>Last Updated: 02/03/2026</span>
+        <button class="outline-btn back-summary-btn">Back to Summary</button>
+      </div>
+    </div>
+
+    <div class="subshell">
+      <div class="sidebar">
+        <div class="sidebar-header">Module Submenu <span>↤</span></div>
+        <div class="sidebar-link active">Comprehensive View</div>
+        <div class="sidebar-link">Evidence Gap Landscape</div>
+        <div class="sidebar-link">Evidence Generation Progress</div>
+        <div class="sidebar-link">Evidence Gap Prioritization</div>
+        <div class="sidebar-link">Evidence Gaps Summary</div>
+      </div>
+
+      <div class="content-shell">
+        <div class="page-head">
+          <h2 id="gapTitle"><span>Abecma Evidence Gaps Summary</span></h2>
+          <div class="page-toolbar">
+            <button class="solid-btn" id="reviewSelectedBtn">Review Selected Gaps</button>
+          </div>
+        </div>
+
+        <div class="group-line">
+          <span>Strategic Imperatives</span>
+          <span class="collapse-toggle" id="toggleSi">− Collapse</span>
+        </div>
+        <div class="si-row" id="siSection">
+          <div class="si-card">
+            <div class="si-id">SI 1</div>
+            <div class="si-text">Advance the science in progressive fibrotic lung diseases, including IPF & PPF</div>
+          </div>
+          <div class="si-card">
+            <div class="si-id">SI 2</div>
+            <div class="si-text">Educate the community on the drug pathway & Ph2 results</div>
+          </div>
+          <div class="si-card">
+            <div class="si-id">SI 3</div>
+            <div class="si-text">Engage with the external experts & form strong partnerships</div>
+          </div>
+        </div>
+
+        <div class="group-line">
+          <span>Evidence Generation Objectives (EGOs)</span>
+          <span class="collapse-toggle" id="toggleEgo">− Collapse</span>
+        </div>
+        <div class="ego-grid" id="egoSection"></div>
+
+        <div class="group-line">
+          <span>Underlying Key Data Maps</span>
+          <span class="collapse-toggle" id="toggleMaps">− Collapse</span>
+        </div>
+        <div class="map-grid" id="gapMapGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAP REVIEW TABLE -->
+  <section class="page" id="gapReviewScreen">
+    <div class="breadcrumb title-stack">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span>Home</span>
+        <span>›</span>
+        <span id="crumbAssetNameReview">Abecma</span>
+        <span>›</span>
+        <span class="active">Selected Gap Review</span>
+      </div>
+      <div id="reviewPlanTag"></div>
+    </div>
+
+    <div class="module-nav">
+      <button class="module-nav-item" data-nav="summary">Executive Summary</button>
+      <button class="module-nav-item active" data-nav="gap">Gap Identification & Prioritization</button>
+      <button class="module-nav-item" data-nav="landscape">Disease & Treatment Landscape</button>
+      <button class="module-nav-item" data-nav="competitive">Competitive Benchmark</button>
+      <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
+      <div class="module-nav-right">
+        <button class="outline-btn" id="backToGapBtn">Back to Gap View</button>
+      </div>
+    </div>
+
+    <div class="content-shell">
+      <div class="page-head">
+        <h2 id="reviewTitle"><span>Abecma Selected Gap Review</span></h2>
+        <div class="page-toolbar">
+          <button class="solid-btn" id="addChangesBtn">Add Changes to E360</button>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+        <div class="inline-badges" style="justify-content:flex-start;">
+          <span class="small-badge badge-ai">AI-generated gaps</span>
+          <span class="small-badge badge-e360">Existing E360 gaps</span>
+        </div>
+        <div id="selectedGapCount" style="font-weight:800;color:#666;">0 selected gaps</div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="review-table">
+          <thead>
+            <tr>
+              <th>EGO</th>
+              <th>Indication</th>
+              <th>EG</th>
+              <th>Gap Rationale</th>
+              <th>Priority</th>
+              <th>Priority Rationale</th>
+              <th>Urgency</th>
+              <th>Urgency Rationale</th>
+              <th>Competitor Flag</th>
+              <th>Competitor Differentiation</th>
+              <th>Evidence Source</th>
+              <th>Module</th>
+              <th>New Evidence</th>
+              <th>Decision</th>
+            </tr>
+          </thead>
+          <tbody id="gapReviewTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="add-gap-panel">
+        <h3>Add a new gap for publishing to Evidence 360</h3>
+        <div class="add-gap-grid">
+          <input type="text" id="customGapTitle" placeholder="Gap title / EG" />
+          <select id="customGapModule">
+            <option value="">Select module</option>
+            <option value="Gap Identification & Prioritization">Gap Identification & Prioritization</option>
+            <option value="Disease & Treatment Landscape">Disease & Treatment Landscape</option>
+            <option value="Competitive Benchmark">Competitive Benchmark</option>
+            <option value="Asset Strategy">Asset Strategy</option>
+          </select>
+          <select id="customGapPriority">
+            <option value="">Priority</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+          </select>
+        </div>
+        <textarea id="customGapRationale" placeholder="Describe the new gap rationale and why it should be added to E360..."></textarea>
+        <button class="solid-btn" id="addCustomGapBtn">Add Gap to Review Table</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAT -->
+  <button class="chat-fab" type="button" id="chatFab">
+    <img src="evgen-ai.png" alt="EvGen AI" />
+    <div>
+      <div class="chat-fab-title">EvGen AI</div>
+      <div class="chat-fab-sub">Ask a question</div>
+    </div>
+  </button>
+
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <img src="evgen-ai.png" alt="EvGen AI" />
+        <div>
+          <div class="chat-title">EvGen AI</div>
+          <div class="chat-status">Context-aware assistant</div>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <button class="chat-icon-btn" id="chatMinimize">−</button>
+        <button class="chat-close" id="chatClose">&times;</button>
+      </div>
+    </div>
+
+    <div class="quick-replies" id="quickReplies"></div>
+    <div class="chat-messages" id="chatMessages"></div>
+
+    <div class="typing-row" id="typingRow">
+      <div class="typing-bubble">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <div class="chat-input-wrap">
+        <input type="text" id="chatInput" class="chat-input" placeholder="Type your message..." />
+        <button class="chat-send" id="chatSend">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Add New Asset</div>
+        <button class="close-btn" id="closeModalBtn">&times;</button>
+      </div>
+      <div class="modal-copy">
+        Upload the relevant source documents required for creating a new plan. Once submitted, the request will be processed in the backend.
+      </div>
+
+      <form id="assetForm">
+        <div class="form-group">
+          <label for="assetName">Asset Name</label>
+          <input type="text" id="assetName" placeholder="Enter asset name" required />
+        </div>
+        <div class="form-group">
+          <label for="assetTA">Therapeutic Area</label>
+          <select id="assetTA" required>
+            <option value="">Select therapeutic area</option>
+            <option value="Oncology">Oncology</option>
+            <option value="Hematology">Hematology</option>
+            <option value="Cardiovascular">Cardiovascular</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="assetMoA">Mechanism of Action</label>
+          <input type="text" id="assetMoA" placeholder="Optional summary of mechanism of action" />
+        </div>
+        <div class="form-group">
+          <label>Upload Relevant Documents</label>
+          <div class="upload-box">
+            <p>Select one or more documents to begin plan creation</p>
+            <input type="file" id="assetDocs" multiple />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn secondary" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn primary">Submit Documents</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-overlay" id="toastOverlay">
+    <div class="toast-card">
+      <div class="toast-icon">✓</div>
+      <div class="toast-title" id="toastTitle">Documents received successfully</div>
+      <div class="toast-copy" id="toastCopy">Your update was saved successfully.</div>
+      <button class="btn primary" id="toastCloseBtn">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const assets = {
+      drafts: [
+        { name: "Pumitamig", ta: "Oncology", moa: "PD-L1 x VEGF bispecific antibody", refreshDate: "03/05/2026", flowTag: "active" },
+        { name: "Camzyra", ta: "Hematology", moa: "Targeted therapy under active evidence compilation", refreshDate: "03/01/2026", flowTag: "active" },
+        { name: "Milvexian", ta: "Cardiovascular", moa: "Oral factor XIa inhibitor for thrombotic risk reduction", refreshDate: "02/26/2026", flowTag: "active" }
+      ],
+      approved: [
+        { name: "Ipilimumab", ta: "Oncology", moa: "CTLA-4 checkpoint inhibitor supporting antitumor immune activation", approvedDate: "01/15/2026" },
+        { name: "Luspatercept", ta: "Hematology", moa: "Erythroid maturation agent for select anemia-related conditions", approvedDate: "02/10/2026" },
+        { name: "Mezigdomide", ta: "Oncology", moa: "Cereblon E3 ligase modulator under oncology development planning", approvedDate: "02/22/2026" },
+        { name: "Nivolumab", ta: "Oncology", moa: "PD-1 checkpoint inhibitor enhancing T-cell mediated antitumor response", approvedDate: "01/08/2026" }
+      ],
+      refresh: [
+        { name: "Abecma", ta: "Oncology", moa: "BCMA-directed cell therapy refresh driven by evolving evidence", refreshDate: "02/18/2026", newInsights: true, clickable: true, flowTag: "refresh" },
+        { name: "Breyanzi", ta: "Oncology", moa: "CD19-directed CAR T-cell therapy requiring updated insight integration", refreshDate: "02/25/2026", newInsights: false, flowTag: "refresh" },
+        { name: "Krazati", ta: "Oncology", moa: "KRAS G12C targeted therapy with new competitive intelligence available", refreshDate: "03/03/2026", newInsights: true, flowTag: "refresh" },
+        { name: "Reblozyl", ta: "Hematology", moa: "Erythroid maturation agent refresh prompted by new treatment landscape inputs", refreshDate: "02/14/2026", newInsights: false, flowTag: "refresh" }
+      ]
+    };
+
+    const egoDefinitions = [
+      {
+        id: "ego1",
+        code: "EGO 1",
+        title: "Increase IPF & PPF awareness",
+        bullets: [
+          "Establish parity in disease burden between IPF & PPF to address HCP perceptions.",
+          "Highlight the need for timely diagnosis & early treatment initiation.",
+          "Drive awareness into real-world treatment patterns & current Tx limitations."
+        ]
+      },
+      {
+        id: "ego2",
+        code: "EGO 2",
+        title: "Differentiate LPA1 MoA",
+        bullets: [
+          "Differentiate & story build vs competitive landscape within IPF & PPF.",
+          "Establish antifibrotic halo within non-pulmonary fibrotic diseases.",
+          "Identify prognostic biomarkers implicated within LPA1 pathway."
+        ]
+      },
+      {
+        id: "ego3",
+        code: "EGO 3",
+        title: "Demonstrate long-term efficacy",
+        bullets: [
+          "Demonstrate meaningful long-term outcomes, quality of life & survival.",
+          "Generate evidence in special populations excluded in Phase 3."
+        ]
+      },
+      {
+        id: "ego4",
+        code: "EGO 4",
+        title: "Establish safety & tolerability",
+        bullets: [
+          "Demonstrate favorable safety and tolerability profile.",
+          "Generate evidence in special populations excluded in Phase 3."
+        ]
+      },
+      {
+        id: "ego5",
+        code: "EGO 5",
+        title: "Drive early value",
+        bullets: [
+          "Develop a strong value proposition for payers.",
+          "Establish positioning in Tx paradigm including monotherapy and combinations."
+        ]
+      }
+    ];
+
+    const gapMaps = [
+      {
+        id: "g1",
+        egoId: "ego1",
+        ego: "Generate data within core tumors (earlier settings, complementary populations): NSCLC",
+        indication: "1L mNSCLC",
+        eg: "Special Populations: Brain mets",
+        rationale: "Addresses a persistent evidence opportunity in a high-risk population underrepresented in trials, where VEGF modulation may offer intracranial benefit beyond PD-1/L1-based SOC.",
+        priority: "High",
+        priorityRationale: "NA",
+        urgency: "Urgent",
+        urgencyRationale: "NA",
+        competitorFlag: "High – Highly Crowded but Clear Differentiation Path",
+        competitorDiff: "",
+        source: "E360",
+        module: "Disease & Treatment Landscape",
+        mapTitle: "Improved / Early Diagnosis",
+        status: "Fully Addressed",
+        statusClass: "full",
+        priorityClass: "high",
+        selected: true
+      },
+      {
+        id: "g2",
+        egoId: "ego1",
+        ego: "Generate data within core tumors (earlier settings, complementary populations): NSCLC",
+        indication: "1L mNSCLC",
+        eg: "Special Populations: Liver mets",
+        rationale: "Enables evaluation in an immunologically hostile setting with poor IO outcomes, supporting differentiation driven by vascular and immune microenvironment modulation.",
+        priority: "High",
+        priorityRationale: "NA",
+        urgency: "Urgent",
+        urgencyRationale: "NA",
+        competitorFlag: "High – Highly Crowded but Clear Differentiation Path",
+        competitorDiff: "",
+        source: "AI",
+        module: "Gap Identification & Prioritization",
+        mapTitle: "Disease burden for patients and caregivers",
+        status: "Not Addressed",
+        statusClass: "not",
+        priorityClass: "medium",
+        selected: false
+      },
+      {
+        id: "g3",
+        egoId: "ego2",
+        ego: "Generate data within core tumors (earlier settings, complementary populations): NSCLC",
+        indication: "1L mNSCLC",
+        eg: ">50% TPS",
+        rationale: "Clarifies benefit in a population with multiple effective SOC options, informing differentiation versus PD-1 monotherapy and emerging combination strategies.",
+        priority: "Medium",
+        priorityRationale: "NA",
+        urgency: "NA",
+        urgencyRationale: "NA",
+        competitorFlag: "High – Highly Crowded but Clear Differentiation Path",
+        competitorDiff: "",
+        source: "AI",
+        module: "Competitive Benchmark",
+        mapTitle: "LPA1 MOA differentiation vs other mechanisms in pulmonary fibrosis",
+        status: "Partially Addressed",
+        statusClass: "partial",
+        priorityClass: "high",
+        newEvidence: true,
+        selected: true
+      },
+      {
+        id: "g4",
+        egoId: "ego2",
+        ego: "Generate data within core tumors (earlier settings, complementary populations): NSCLC",
+        indication: "1L mNSCLC",
+        eg: "Lack of a validated biomarker framework to select patients for PD-L1 × VEGF therapy beyond PD-L1 TPS",
+        rationale: "Addresses a key evidence gap in biomarker-driven selection for PD-(L)1 × VEGF bispecifics in NSCLC, where activity beyond PD-L1 underscores the need for validated markers.",
+        priority: "High",
+        priorityRationale: "Differentiate patient selection and phase 3 success",
+        urgency: "Urgent",
+        urgencyRationale: "Needed before late-stage positioning",
+        competitorFlag: "Moderate – Crowded but biomarker white space exists",
+        competitorDiff: "Stronger differentiation path if biomarker framework is validated earlier than peers.",
+        source: "E360",
+        module: "Competitive Benchmark",
+        mapTitle: "Comparative evidence vs current & future Tx",
+        status: "Partially Addressed",
+        statusClass: "partial",
+        priorityClass: "high",
+        newEvidence: true,
+        selected: true
+      },
+      {
+        id: "g5",
+        egoId: "ego3",
+        ego: "Generate data within core tumors (earlier settings, complementary populations): NSCLC",
+        indication: "mNSCLC",
+        eg: "Post-EGFR TKI mNSCLC (EGFR-mutated): Role of a PD-L1 × VEGF bispecific after EGFR-TKI resistance versus current standards",
+        rationale: "Addresses a critical evidence gap in defining the optimal post-EGFR TKI regimen and whether IO-VEGF biology can support class validation and safety differentiation.",
+        priority: "High",
+        priorityRationale: "Unmet need with poor outcomes post-TKI",
+        urgency: "Urgent",
+        urgencyRationale: "Supports expansion into resistant population",
+        competitorFlag: "Moderate",
+        competitorDiff: "Phase III data could provide class validation and support future expansion into post-EGFR-TKI resistant NSCLC.",
+        source: "AI",
+        module: "Gap Identification & Prioritization",
+        mapTitle: "Quality of life",
+        status: "Partially Addressed",
+        statusClass: "partial",
+        priorityClass: "high",
+        newEvidence: true,
+        selected: true
+      },
+      {
+        id: "g6",
+        egoId: "ego4",
+        ego: "Generate data within core tumors (earlier settings, complementary populations): NSCLC",
+        indication: "mNSCLC",
+        eg: "2L+ mNSCLC after anti-PD-(L)1 + platinum: Activity after first-line chemo-immunotherapy",
+        rationale: "Addresses a major evidence gap in the post-IO setting, where poor real-world outcomes highlight unmet need but clinical data are limited.",
+        priority: "Medium",
+        priorityRationale: "Relevant for sequencing decisions",
+        urgency: "Medium",
+        urgencyRationale: "Needs additional evidence",
+        competitorFlag: "Moderate",
+        competitorDiff: "Potential differentiation if activity is shown after prior PD-L1 therapy.",
+        source: "E360",
+        module: "Disease & Treatment Landscape",
+        mapTitle: "FVC durability",
+        status: "Not Addressed",
+        statusClass: "not",
+        priorityClass: "high",
+        selected: false
+      },
+      {
+        id: "g7",
+        egoId: "ego4",
+        ego: "Generate tolerability evidence in complementary populations",
+        indication: "Cross-tumor",
+        eg: "Safety in special populations excluded from Ph3",
+        rationale: "Safety evidence for excluded populations is insufficient across currently reviewed packages.",
+        priority: "Medium",
+        priorityRationale: "Important for broader label confidence",
+        urgency: "Medium",
+        urgencyRationale: "Dependent on follow-up studies",
+        competitorFlag: "Low",
+        competitorDiff: "Could support differentiation in more fragile populations if addressed early.",
+        source: "AI",
+        module: "Gap Identification & Prioritization",
+        mapTitle: "Safety in special populations excluded from Ph3",
+        status: "Not Addressed",
+        statusClass: "not",
+        priorityClass: "medium",
+        selected: true
+      },
+      {
+        id: "g8",
+        egoId: "ego5",
+        ego: "Generate value evidence and positioning rationale",
+        indication: "Cross-tumor",
+        eg: "Combination / switch from other Tx options",
+        rationale: "Comparator switching strategy evidence remains incomplete across current benchmark programs.",
+        priority: "High",
+        priorityRationale: "Needed for positioning and payer story",
+        urgency: "Urgent",
+        urgencyRationale: "Important before launch planning",
+        competitorFlag: "High",
+        competitorDiff: "Clear switch-positioning could sharpen market access differentiation.",
+        source: "AI",
+        module: "Asset Strategy",
+        mapTitle: "Combination / switch from other Tx options",
+        status: "Not Addressed",
+        statusClass: "not",
+        priorityClass: "high",
+        selected: false
+      },
+      {
+        id: "g9",
+        egoId: "ego5",
+        ego: "Generate value evidence and positioning rationale",
+        indication: "Cross-tumor",
+        eg: "Treatment Regimen (dosing, titration)",
+        rationale: "No conclusive evidence package yet for dosing and titration strategy in special populations.",
+        priority: "High",
+        priorityRationale: "Operational feasibility and adoption",
+        urgency: "Urgent",
+        urgencyRationale: "Needed for real-world implementation",
+        competitorFlag: "Moderate",
+        competitorDiff: "Operational simplicity could become a practical differentiator.",
+        source: "AI",
+        module: "Asset Strategy",
+        mapTitle: "Treatment Regimen (dosing, titration)",
+        status: "Not Addressed",
+        statusClass: "not",
+        priorityClass: "high",
+        selected: true
+      }
+    ];
+
+    let currentAsset = "Abecma";
+    let currentAssetFlowTag = "refresh";
+    let activePage = "landingScreen";
+    let activeNav = "summary";
+    let activeEgoFilter = null;
+    let egoCollapsed = false;
+    let mapsCollapsed = false;
+    let siCollapsed = false;
+    let currentDetailModule = "landscape";
+
+    const pages = {
+      landing: document.getElementById("landingScreen"),
+      summary: document.getElementById("summaryScreen"),
+      competitive: document.getElementById("competitiveScreen"),
+      detail: document.getElementById("detailScreen"),
+      gap: document.getElementById("gapScreen"),
+      review: document.getElementById("gapReviewScreen")
+    };
+
+    function getPlanTagHTML(type) {
+      if (type === "refresh") return `<span class="plan-tag refresh">Refresh Plan</span>`;
+      if (type === "active") return `<span class="plan-tag active">Active Plan</span>`;
+      return "";
+    }
+
+    function setHeaderMode() {
+      const onLanding = activePage === "landingScreen";
+      document.getElementById("centerTitle").classList.toggle("hidden", !onLanding);
+      document.getElementById("openModalBtn").classList.toggle("hidden", !onLanding);
+      document.getElementById("brandText").textContent = "Bristol Myers Squibb";
+    }
+
+    function showPage(key) {
+      Object.values(pages).forEach(p => p.classList.remove("active"));
+      pages[key].classList.add("active");
+      activePage = pages[key].id;
+      setHeaderMode();
+      updateQuickReplies();
+      updateNavButtons();
+      syncBreadcrumbTags();
+    }
+
+    function updateNavButtons() {
+      document.querySelectorAll(".module-nav-item").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.nav === activeNav);
+      });
+    }
+
+    function syncBreadcrumbTags() {
+      const tagHTML = getPlanTagHTML(currentAssetFlowTag);
+      document.getElementById("summaryPlanTag").innerHTML = tagHTML;
+      document.getElementById("competitivePlanTag").innerHTML = tagHTML;
+      document.getElementById("detailPlanTag").innerHTML = tagHTML;
+      document.getElementById("gapPlanTag").innerHTML = tagHTML;
+      document.getElementById("reviewPlanTag").innerHTML = tagHTML;
+
+      document.getElementById("crumbAssetName").textContent = currentAsset;
+      document.getElementById("crumbAssetNameCompetitive").textContent = currentAsset;
+      document.getElementById("crumbAssetNameDetail").textContent = currentAsset;
+      document.getElementById("crumbAssetNameGap").textContent = currentAsset;
+      document.getElementById("crumbAssetNameReview").textContent = currentAsset;
+    }
+
+    function setAssetName(name, flowTag = "refresh") {
+      currentAsset = name;
+      currentAssetFlowTag = flowTag;
+      document.getElementById("compTitle").innerHTML = `${name} | <span>Comprehensive View</span>`;
+      document.getElementById("gapTitle").innerHTML = `<span>${name} Evidence Gaps Summary</span>`;
+      document.getElementById("reviewTitle").innerHTML = `<span>${name} Selected Gap Review</span>`;
+      syncBreadcrumbTags();
+      setHeaderMode();
+    }
+
+    function openAssetFlow(name, flowTag = "refresh") {
+      setAssetName(name, flowTag);
+      activeNav = "summary";
+      showPage("summary");
+    }
+
+    function openModule(module) {
+      activeNav = module;
+      if (module === "summary") {
+        showPage("summary");
+      } else if (module === "competitive") {
+        showPage("competitive");
+      } else if (module === "gap") {
+        showPage("gap");
+      } else if (module === "landscape" || module === "strategy") {
+        currentDetailModule = module;
+        renderDetailScreen(module);
+        showPage("detail");
+      }
+      updateNavButtons();
+    }
+
+    function renderAssetCard(asset, laneType) {
+      const card = document.createElement("div");
+      card.className = `asset-card ${laneType} ${asset.clickable ? "clickable" : ""}`;
+
+      let tagHtml = "";
+      if (laneType === "refresh" && asset.newInsights) tagHtml = `<div class="tag new">NEW INSIGHTS</div>`;
+      if (laneType === "approved") tagHtml = `<div class="tag approved">APPROVED</div>`;
+
+      let metaHtml = "";
+      if (laneType === "drafts") {
+        metaHtml = `
+          <div class="meta-row"><div class="meta-label">Last refresh date</div><div class="meta-value">${asset.refreshDate}</div></div>
+          <div class="meta-row"><div class="meta-label">Current status</div><div class="meta-value">Under review</div></div>
+        `;
+      } else if (laneType === "approved") {
+        metaHtml = `
+          <div class="meta-row"><div class="meta-label">Approved date</div><div class="meta-value">${asset.approvedDate}</div></div>
+          <div class="meta-row"><div class="meta-label">Plan status</div><div class="meta-value">Finalized</div></div>
+        `;
+      } else {
+        metaHtml = `
+          <div class="meta-row"><div class="meta-label">Last refreshed</div><div class="meta-value">${asset.refreshDate}</div></div>
+          <div class="meta-row"><div class="meta-label">Review priority</div><div class="meta-value">${asset.newInsights ? "High" : "Standard"}</div></div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="card-top">
+          <div>
+            <div class="asset-name">${asset.name}</div>
+            <div class="ta-pill">${asset.ta}</div>
+          </div>
+          ${tagHtml}
+        </div>
+        <div class="card-body">
+          <div class="card-section-label">Mechanism of Action</div>
+          <div class="moa-text">${asset.moa}</div>
+        </div>
+        <div class="card-meta">${metaHtml}</div>
+      `;
+
+      if (asset.clickable) {
+        card.addEventListener("click", () => openAssetFlow(asset.name, asset.flowTag || "refresh"));
+      }
+      return card;
+    }
+
+    function renderLane(container, items, laneType) {
+      container.innerHTML = "";
+      if (!items.length) {
+        container.innerHTML = `<div class="asset-card"><div class="moa-text">No assets match the selected filters.</div></div>`;
+        return;
+      }
+      items.forEach(item => container.appendChild(renderAssetCard(item, laneType)));
+    }
+
+    function applyLandingFilters() {
+      const ta = document.getElementById("taFilter").value.toLowerCase();
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+
+      const match = a => {
+        const taMatch = ta === "all" || a.ta.toLowerCase() === ta;
+        const qMatch = !query || a.name.toLowerCase().includes(query) || a.ta.toLowerCase().includes(query) || a.moa.toLowerCase().includes(query);
+        return taMatch && qMatch;
+      };
+
+      const drafts = assets.drafts.filter(match);
+      const approved = assets.approved.filter(match);
+      const refresh = assets.refresh.filter(match);
+
+      renderLane(document.getElementById("draftsLane"), drafts, "drafts");
+      renderLane(document.getElementById("approvedLane"), approved, "approved");
+      renderLane(document.getElementById("refreshLane"), refresh, "refresh");
+
+      document.getElementById("count-drafts").textContent = drafts.length;
+      document.getElementById("count-approved").textContent = approved.length;
+      document.getElementById("count-refresh").textContent = refresh.length;
+    }
+
+    document.getElementById("taFilter").addEventListener("change", applyLandingFilters);
+    document.getElementById("searchInput").addEventListener("input", applyLandingFilters);
+
+    document.getElementById("backToAssetsBtn").addEventListener("click", () => {
+      activeNav = "summary";
+      showPage("landing");
+    });
+
+    document.querySelectorAll(".deep-dive-btn").forEach(btn => {
+      btn.addEventListener("click", () => openModule(btn.dataset.module));
+    });
+
+    document.querySelectorAll(".back-summary-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeNav = "summary";
+        showPage("summary");
+      });
+    });
+
+    document.querySelectorAll(".module-nav-item").forEach(btn => {
+      btn.addEventListener("click", () => openModule(btn.dataset.nav));
+    });
+
+    function renderDetailScreen(module) {
+      const titleMap = {
+        landscape: "Disease & Treatment Landscape",
+        strategy: "Asset Strategy"
+      };
+      document.getElementById("detailTitle").innerHTML = `${currentAsset} | <span>${titleMap[module]}</span>`;
+      document.getElementById("detailBreadcrumbTitle").textContent = titleMap[module];
+
+      const content = document.getElementById("detailContent");
+      if (module === "landscape") {
+        content.innerHTML = `
+          <div class="detail-section">
+            <div class="section-title">Disease & Treatment Landscape</div>
+            <div class="detail-box">
+              <div class="metric-row">
+                <div class="metric-mini">
+                  <div class="num">40</div>
+                  <div class="txt">tumors being explored</div>
+                </div>
+                <div class="metric-mini">
+                  <div class="num">5</div>
+                  <div class="txt">CDP tumors</div>
+                </div>
+                <div class="metric-mini">
+                  <div class="num">6</div>
+                  <div class="txt">non-CDP tumors</div>
+                </div>
+              </div>
+
+              <div class="section-head">Landscape Breadth</div>
+              <ul class="bullet-list">
+                <li>Across solid tumors, the PD-L1 × VEGF concept is being explored where immune exclusion and angiogenic signaling co-dominate the microenvironment.</li>
+                <li>Emerging relevance appears most concentrated in vascularized, myeloid-inflamed settings that historically use checkpoint inhibitors paired with anti-angiogenics, with extensions into combinations that benefit from vascular normalization.</li>
+              </ul>
+
+              <div class="section-head" style="margin-top:12px;">Treatment Paradigm Fit</div>
+              <ul class="bullet-list">
+                <li>The asset aligns with established practice patterns that pair immune checkpoint blockade with anti-angiogenic therapy while consolidating dual pathway modulation into a single molecule.</li>
+                <li>It fits best where normalizing vasculature and restoring effector function are jointly sought, and may complement modalities whose delivery improves when endothelial dysfunction and hypoxia are mitigated.</li>
+              </ul>
+
+              <div class="section-head" style="margin-top:12px;">Signal Concentration Drivers</div>
+              <ul class="bullet-list">
+                <li>Promise tends to emerge in immune-excluded, hypoxic tumors with high angiogenesis signatures where VEGF-driven endothelial dysfunction impairs T-cell entry and sustains PD-L1-mediated suppression.</li>
+              </ul>
+            </div>
+          </div>
+        `;
+      } else {
+        content.innerHTML = `
+          <div class="detail-section">
+            <div class="group-line"><span>Strategic Imperatives</span></div>
+            <div class="si-row">
+              <div class="si-card">
+                <div class="si-id">SI 1</div>
+                <div class="si-text">Advance the science in progressive fibrotic lung diseases, including IPF & PPF</div>
+              </div>
+              <div class="si-card">
+                <div class="si-id">SI 2</div>
+                <div class="si-text">Educate the community on the drug pathway & Ph2 results</div>
+              </div>
+              <div class="si-card">
+                <div class="si-id">SI 3</div>
+                <div class="si-text">Engage with the external experts & form strong partnerships</div>
+              </div>
+            </div>
+
+            <div class="group-line"><span>Evidence Generation Objectives (EGOs)</span></div>
+            <div class="ego-grid">
+              ${egoDefinitions.map(ego => `
+                <div class="ego-card">
+                  <div class="ego-top">${ego.code}</div>
+                  <div class="ego-body">
+                    <h4>${ego.title}</h4>
+                    <ul class="bullet-list">
+                      ${ego.bullets.map(b => `<li>${b}</li>`).join("")}
+                    </ul>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function renderEgoCards() {
+      const container = document.getElementById("egoSection");
+      container.innerHTML = "";
+      egoDefinitions.forEach(ego => {
+        const card = document.createElement("div");
+        card.className = `ego-card ${activeEgoFilter === ego.id ? "active" : ""}`;
+        card.innerHTML = `
+          <div class="ego-top">${ego.code}</div>
+          <div class="ego-body">
+            <h4>${ego.title}</h4>
+            <ul class="bullet-list">
+              ${ego.bullets.map(b => `<li>${b}</li>`).join("")}
+            </ul>
+          </div>
+        `;
+        card.addEventListener("click", () => {
+          activeEgoFilter = activeEgoFilter === ego.id ? null : ego.id;
+          renderEgoCards();
+          renderGapMaps();
+        });
+        container.appendChild(card);
+      });
+    }
+
+    function getFilteredGaps() {
+      return activeEgoFilter ? gapMaps.filter(g => g.egoId === activeEgoFilter) : gapMaps;
+    }
+
+    function renderGapMaps() {
+      const grid = document.getElementById("gapMapGrid");
+      grid.innerHTML = "";
+      const filtered = getFilteredGaps();
+
+      if (!filtered.length) {
+        grid.innerHTML = `<div class="map-card"><div class="map-head">No gaps found for the selected EGO.</div></div>`;
+        return;
+      }
+
+      filtered.forEach(gap => {
+        const card = document.createElement("div");
+        card.className = `map-card ${gap.priorityClass}`;
+        card.innerHTML = `
+          <div class="map-head">
+            <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;">
+              <input type="checkbox" class="gap-check" data-id="${gap.id}" ${gap.selected ? "checked" : ""} />
+              <span>${gap.mapTitle}</span>
+            </label>
+          </div>
+          <div class="map-foot">
+            <span class="map-status ${gap.statusClass}">${gap.status}</span>
+            <span class="map-priority ${gap.priorityClass}">● ${gap.priority}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      grid.querySelectorAll(".gap-check").forEach(cb => {
+        cb.addEventListener("change", () => {
+          const gap = gapMaps.find(g => g.id === cb.dataset.id);
+          if (gap) gap.selected = cb.checked;
+          updateSelectedGapCount();
+        });
+      });
+
+      updateSelectedGapCount();
+    }
+
+    function updateSelectedGapCount() {
+      const count = gapMaps.filter(g => g.selected).length;
+      document.getElementById("selectedGapCount").textContent = `${count} selected gaps`;
+    }
+
+    function toggleSection(sectionId, btnId, stateKey) {
+      const el = document.getElementById(sectionId);
+      const btn = document.getElementById(btnId);
+      let collapsed = false;
+
+      if (stateKey === "si") {
+        siCollapsed = !siCollapsed;
+        collapsed = siCollapsed;
+      }
+      if (stateKey === "ego") {
+        egoCollapsed = !egoCollapsed;
+        collapsed = egoCollapsed;
+      }
+      if (stateKey === "maps") {
+        mapsCollapsed = !mapsCollapsed;
+        collapsed = mapsCollapsed;
+      }
+
+      el.classList.toggle("hidden", collapsed);
+      btn.textContent = collapsed ? "+ Expand" : "− Collapse";
+    }
+
+    document.getElementById("toggleSi").addEventListener("click", () => toggleSection("siSection", "toggleSi", "si"));
+    document.getElementById("toggleEgo").addEventListener("click", () => toggleSection("egoSection", "toggleEgo", "ego"));
+    document.getElementById("toggleMaps").addEventListener("click", () => toggleSection("gapMapGrid", "toggleMaps", "maps"));
+
+    function renderReviewTable() {
+      const tbody = document.getElementById("gapReviewTableBody");
+      tbody.innerHTML = "";
+
+      const selected = gapMaps.filter(g => g.selected);
+      document.getElementById("selectedGapCount").textContent = `${selected.length} selected gaps`;
+
+      if (!selected.length) {
+        tbody.innerHTML = `<tr><td colspan="14" class="center">No gaps selected. Return to the previous screen and select at least one gap.</td></tr>`;
+        return;
+      }
+
+      selected.forEach(gap => {
+        const tr = document.createElement("tr");
+        const decision = gap.reviewDecision || "";
+
+        tr.innerHTML = `
+          <td>${gap.ego}</td>
+          <td class="center">${gap.indication}</td>
+          <td>${gap.eg}</td>
+          <td>${gap.rationale}</td>
+          <td class="center">${gap.priority}</td>
+          <td class="center">${gap.priorityRationale}</td>
+          <td class="center">${gap.urgency}</td>
+          <td class="center">${gap.urgencyRationale}</td>
+          <td class="center">${gap.competitorFlag}</td>
+          <td>${gap.competitorDiff || ""}</td>
+          <td class="center">
+            <span class="source-badge ${gap.source === "AI" ? "src-ai" : "src-e360"}">${gap.source}</span>
+          </td>
+          <td class="center">
+            <span class="module-link" data-module="${gap.module}">${gap.module}</span>
+          </td>
+          <td class="center">
+            ${gap.newEvidence ? `<span class="evidence-pill">New evidence</span>` : ""}
+          </td>
+          <td class="center">
+            <div class="icon-actions">
+              <button class="icon-decision approve ${decision === "Approved" ? "active" : ""}" title="Approve">✓</button>
+              <button class="icon-decision decline ${decision === "Declined" ? "active" : ""}" title="Decline">✕</button>
+              <button class="icon-decision unclear ${decision === "Not enough Evidence" ? "active" : ""}" title="Not enough Evidence">?</button>
+            </div>
+            <div class="decision-output">${decision || "Pending"}</div>
+          </td>
+        `;
+
+        tr.querySelector(".module-link").addEventListener("click", (e) => {
+          const moduleName = e.target.dataset.module;
+          if (moduleName.includes("Competitive")) openModule("competitive");
+          else if (moduleName.includes("Gap")) openModule("gap");
+          else if (moduleName.includes("Disease")) openModule("landscape");
+          else openModule("strategy");
+        });
+
+        const approve = tr.querySelector(".approve");
+        const decline = tr.querySelector(".decline");
+        const unclear = tr.querySelector(".unclear");
+        const output = tr.querySelector(".decision-output");
+
+        function setDecision(value) {
+          gap.reviewDecision = value;
+          approve.classList.toggle("active", value === "Approved");
+          decline.classList.toggle("active", value === "Declined");
+          unclear.classList.toggle("active", value === "Not enough Evidence");
+          output.textContent = value;
+
+          if (gap.newEvidence && gap.status === "Partially Addressed" && value === "Approved") {
+            gap.status = "Addressed";
+          }
+        }
+
+        approve.addEventListener("click", () => setDecision("Approved"));
+        decline.addEventListener("click", () => setDecision("Declined"));
+        unclear.addEventListener("click", () => setDecision("Not enough Evidence"));
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById("reviewSelectedBtn").addEventListener("click", () => {
+      activeNav = "gap";
+      renderReviewTable();
+      showPage("review");
+    });
+
+    document.getElementById("backToGapBtn").addEventListener("click", () => {
+      activeNav = "gap";
+      showPage("gap");
+    });
+
+    document.getElementById("addChangesBtn").addEventListener("click", () => {
+      showToast(
+        "Changes have been updated to Evidence 360",
+        `The selected gap decisions for <strong>${currentAsset}</strong> have been updated.<br/><br/><a href="#" style="color:var(--primary);font-weight:800;text-decoration:underline;">Open Evidence 360</a>`
+      );
+    });
+
+    document.getElementById("addCustomGapBtn").addEventListener("click", () => {
+      const title = document.getElementById("customGapTitle").value.trim();
+      const module = document.getElementById("customGapModule").value;
+      const priority = document.getElementById("customGapPriority").value;
+      const rationale = document.getElementById("customGapRationale").value.trim();
+
+      if (!title || !module || !priority || !rationale) {
+        alert("Please complete all fields before adding a new gap.");
+        return;
+      }
+
+      const newGap = {
+        id: `custom-${Date.now()}`,
+        egoId: activeEgoFilter || "ego5",
+        ego: "User-added gap for publication to E360",
+        indication: "Custom",
+        eg: title,
+        rationale,
+        priority,
+        priorityRationale: "User submitted",
+        urgency: priority === "High" ? "Urgent" : "Medium",
+        urgencyRationale: "User submitted",
+        competitorFlag: "User defined",
+        competitorDiff: "To be refined during Evidence 360 publication review.",
+        source: "AI",
+        module,
+        mapTitle: title,
+        status: "Not Addressed",
+        statusClass: "not",
+        priorityClass: priority === "High" ? "high" : "medium",
+        selected: true,
+        reviewDecision: "Approved",
+        custom: true
+      };
+
+      gapMaps.push(newGap);
+      renderGapMaps();
+      renderReviewTable();
+
+      document.getElementById("customGapTitle").value = "";
+      document.getElementById("customGapModule").value = "";
+      document.getElementById("customGapPriority").value = "";
+      document.getElementById("customGapRationale").value = "";
+
+      showToast(
+        "New gap added to the review list",
+        `The custom gap has been added for <strong>${currentAsset}</strong> and is ready for review before publishing to Evidence 360.`
+      );
+    });
+
+    // MODAL / TOAST
+    const modalOverlay = document.getElementById("modalOverlay");
+    const toastOverlay = document.getElementById("toastOverlay");
+
+    function showToast(title, copy) {
+      document.getElementById("toastTitle").innerHTML = title;
+      document.getElementById("toastCopy").innerHTML = copy;
+      toastOverlay.classList.add("active");
+    }
+    function closeToast() { toastOverlay.classList.remove("active"); }
+    function openModal() { modalOverlay.classList.add("active"); }
+    function closeModal() {
+      modalOverlay.classList.remove("active");
+      document.getElementById("assetForm").reset();
+    }
+
+    document.getElementById("openModalBtn").addEventListener("click", openModal);
+    document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+    document.getElementById("cancelBtn").addEventListener("click", closeModal);
+    document.getElementById("toastCloseBtn").addEventListener("click", closeToast);
+
+    modalOverlay.addEventListener("click", (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+    toastOverlay.addEventListener("click", (e) => {
+      if (e.target === toastOverlay) closeToast();
+    });
+
+    document.getElementById("assetForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("assetName").value.trim();
+      const ta = document.getElementById("assetTA").value;
+      const docs = document.getElementById("assetDocs").files;
+      if (!name || !ta || docs.length === 0) {
+        alert("Please enter the asset details and upload at least one document.");
+        return;
+      }
+      closeModal();
+      showToast(
+        "Documents received successfully",
+        "Data processing is underway in the backend. You can expect the asset card to appear in approximately two weeks."
+      );
+    });
+
+    // CHAT
+    const chatFab = document.getElementById("chatFab");
+    const chatWindow = document.getElementById("chatWindow");
+    const chatClose = document.getElementById("chatClose");
+    const chatMinimize = document.getElementById("chatMinimize");
+    const chatMessages = document.getElementById("chatMessages");
+    const chatInput = document.getElementById("chatInput");
+    const chatSend = document.getElementById("chatSend");
+    const quickReplies = document.getElementById("quickReplies");
+    const typingRow = document.getElementById("typingRow");
+    let chatInitialized = false;
+    let typingTimer = null;
+
+    function getFirstName(fullName) {
+      return fullName.trim().split(" ")[0] || "there";
+    }
+
+    function addMessage(html, sender = "bot", suggestions = []) {
+      const el = document.createElement("div");
+      el.className = `chat-message ${sender}`;
+      el.innerHTML = html;
+
+      if (sender === "bot" && suggestions.length) {
+        const wrap = document.createElement("div");
+        wrap.className = "module-suggestions";
+        suggestions.forEach(key => {
+          const btn = document.createElement("button");
+          btn.className = "module-suggest";
+          btn.textContent = `Explore ${moduleLabel(key)}`;
+          btn.addEventListener("click", () => openModule(key));
+          wrap.appendChild(btn);
+        });
+        el.appendChild(wrap);
+      }
+
+      chatMessages.appendChild(el);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showTyping() {
+      clearTimeout(typingTimer);
+      typingRow.classList.add("active");
+    }
+    function hideTyping() {
+      clearTimeout(typingTimer);
+      typingRow.classList.remove("active");
+    }
+    function botReply(html, delay = 600, suggestions = []) {
+      showTyping();
+      typingTimer = setTimeout(() => {
+        hideTyping();
+        addMessage(html, "bot", suggestions);
+      }, delay);
+    }
+
+    function currentContext() {
+      if (activePage === "landingScreen") return "landing";
+      if (activePage === "summaryScreen") return "summary";
+      if (activePage === "gapScreen" || activePage === "gapReviewScreen") return "gap";
+      if (activePage === "competitiveScreen") return "competitive";
+      if (activePage === "detailScreen") return currentDetailModule;
+      return "summary";
+    }
+
+    function moduleLabel(key) {
+      return {
+        summary: "Executive Summary",
+        gap: "Gap Identification",
+        competitive: "Competitive Benchmark",
+        landscape: "Disease Landscape",
+        strategy: "Asset Strategy"
+      }[key] || key;
+    }
+
+    function updateQuickReplies() {
+      const context = currentContext();
+      const map = {
+        landing: [
+          "Open Abecma summary",
+          "Which asset needs refresh?",
+          "Show oncology assets",
+          "Help me add a new asset"
+        ],
+        summary: [
+          "Summarize the priority gaps",
+          "Which module should I review next?",
+          "Show AI-generated gaps",
+          "What changed since last review?"
+        ],
+        gap: [
+          "Show partially addressed gaps",
+          "Which gaps have new evidence?",
+          "How many AI vs E360 gaps?",
+          "Take me to gap review"
+        ],
+        competitive: [
+          "Summarize benchmark risks",
+          "How is BMS differentiated?",
+          "Which module should I review next?",
+          "Back to executive summary"
+        ],
+        landscape: [
+          "Summarize disease breadth",
+          "What are the key drivers?",
+          "Which module should I review next?",
+          "Back to executive summary"
+        ],
+        strategy: [
+          "Summarize strategic imperatives",
+          "Which EGO looks highest priority?",
+          "Which module should I review next?",
+          "Back to executive summary"
+        ]
+      };
+
+      quickReplies.innerHTML = "";
+      (map[context] || map.summary).forEach(text => {
+        const btn = document.createElement("button");
+        btn.className = "quick-reply";
+        btn.textContent = text;
+        quickReplies.appendChild(btn);
+      });
+    }
+
+    function initializeChat() {
+      if (chatInitialized) return;
+      addMessage(`Hello "${getFirstName(document.getElementById("profileName").textContent)}"! I’m EvGen AI. I can help summarize evidence, highlight gaps, and suggest which module to explore for <strong>${currentAsset}</strong>.`, "bot", ["summary", "gap"]);
+      chatInitialized = true;
+    }
+
+    function openChat() {
+      chatWindow.classList.add("open");
+      initializeChat();
+      updateQuickReplies();
+      setTimeout(() => chatInput.focus(), 50);
+    }
+    function closeChat() {
+      chatWindow.classList.remove("open");
+      hideTyping();
+    }
+
+    function generateResponse(text) {
+      const msg = text.toLowerCase();
+      const context = currentContext();
+
+      if (msg.includes("open abecma summary")) {
+        openAssetFlow("Abecma", "refresh");
+        return {
+          text: `Opening the executive summary for <strong>Abecma</strong>. This refresh flow prioritizes Gap Identification, Disease & Treatment Landscape, Competitive Benchmarking, and Asset Strategy.`,
+          suggestions: ["summary", "gap"]
+        };
+      }
+      if (msg.includes("which asset needs refresh")) {
+        return {
+          text: `Refresh assets currently shown include <strong>Abecma</strong>, <strong>Breyanzi</strong>, <strong>Krazati</strong>, and <strong>Reblozyl</strong>. <strong>Abecma</strong> has been configured as the clickable refresh-flow asset.`,
+          suggestions: ["summary"]
+        };
+      }
+      if (msg.includes("show oncology assets")) {
+        return {
+          text: `Oncology assets currently visible include Pumitamig, Ipilimumab, Mezigdomide, Nivolumab, Abecma, Breyanzi, and Krazati.`,
+          suggestions: ["summary"]
+        };
+      }
+      if (msg.includes("summarize the priority gaps")) {
+        return {
+          text: `There are <strong>11 total gaps</strong> in view, including <strong>6 AI-generated</strong> and <strong>5 existing E360</strong>. The most important review areas are biomarker segmentation, comparative safety-efficacy profiles, sequencing questions, and special population evidence gaps.`,
+          suggestions: ["gap", "competitive"]
+        };
+      }
+      if (msg.includes("which module should i review next")) {
+        if (context === "competitive") {
+          return {
+            text: `From the competitive view, the most relevant next module is <strong>Gap Identification & Prioritization</strong> so you can validate whether benchmark differences translate into actionable evidence gaps.`,
+            suggestions: ["gap", "summary"]
+          };
+        }
+        if (context === "gap") {
+          return {
+            text: `From the gap view, the most relevant next module is <strong>Competitive Benchmark</strong> if you want to validate differentiation, or <strong>Asset Strategy</strong> if you want to prioritize internal action.`,
+            suggestions: ["competitive", "strategy"]
+          };
+        }
+        return {
+          text: `The best next module to review is <strong>Gap Identification & Prioritization</strong>, followed by <strong>Competitive Benchmark</strong> if you want to validate external differentiation.`,
+          suggestions: ["gap", "competitive"]
+        };
+      }
+      if (msg.includes("show ai-generated gaps")) {
+        return {
+          text: `AI-generated gaps currently include liver metastases, >50% TPS differentiation, post-EGFR TKI role, safety in special populations, and treatment regimen positioning.`,
+          suggestions: ["gap"]
+        };
+      }
+      if (msg.includes("what changed since last review")) {
+        return {
+          text: `Since the last review, the major updates are: <strong>11 total gaps</strong>, <strong>4 priority gaps</strong>, <strong>5 key competitors</strong>, next milestone on <strong>03/12/2026</strong>, and top risk remains <strong>Enrollment</strong>.`,
+          suggestions: ["summary", "gap"]
+        };
+      }
+      if (msg.includes("partially addressed gaps")) {
+        return {
+          text: `Partially addressed gaps include <strong>LPA1 MOA differentiation</strong>, <strong>lack of a validated biomarker framework</strong>, <strong>post-EGFR TKI regimen</strong>, and <strong>comparative evidence</strong>. Several of these have new evidence flagged for review.`,
+          suggestions: ["gap"]
+        };
+      }
+      if (msg.includes("which gaps have new evidence")) {
+        return {
+          text: `New evidence is currently flagged for gaps related to <strong>MOA differentiation</strong>, <strong>biomarker framework validation</strong>, and <strong>post-EGFR TKI positioning</strong>. These are strong candidates for status re-evaluation.`,
+          suggestions: ["gap"]
+        };
+      }
+      if (msg.includes("how many ai vs e360 gaps")) {
+        return {
+          text: `There are <strong>6 AI-generated gaps</strong> and <strong>5 E360-origin gaps</strong> in the current gap set.`,
+          suggestions: ["gap"]
+        };
+      }
+      if (msg.includes("take me to gap review")) {
+        renderReviewTable();
+        activeNav = "gap";
+        showPage("review");
+        return {
+          text: `Opening the selected gap review table so you can validate evidence and approve, decline, or mark gaps as not having enough evidence.`,
+          suggestions: ["gap"]
+        };
+      }
+      if (msg.includes("summarize benchmark risks")) {
+        return {
+          text: `The benchmark risks center on comparator crowding, overlapping populations, and uncertainty around evidence timing and biomarker-led differentiation.`,
+          suggestions: ["competitive", "gap"]
+        };
+      }
+      if (msg.includes("how is bms differentiated")) {
+        return {
+          text: `BMS differentiation appears strongest where biomarker precision, sequencing strategy, and operational simplicity create separation from crowded comparator programs.`,
+          suggestions: ["competitive", "strategy"]
+        };
+      }
+      if (msg.includes("summarize disease breadth")) {
+        return {
+          text: `The disease landscape suggests broad exploration across solid tumors, with the concept appearing strongest in vascularized, myeloid-inflamed, and immune-excluded settings.`,
+          suggestions: ["landscape", "summary"]
+        };
+      }
+      if (msg.includes("what are the key drivers")) {
+        return {
+          text: `The key signal concentration drivers are immune exclusion, hypoxia, endothelial dysfunction, and high angiogenesis signatures that may benefit from vascular normalization.`,
+          suggestions: ["landscape", "gap"]
+        };
+      }
+      if (msg.includes("summarize strategic imperatives")) {
+        return {
+          text: `The three strategic imperatives are: advancing the science, educating the community on pathway and results, and engaging external experts to build partnerships.`,
+          suggestions: ["strategy", "gap"]
+        };
+      }
+      if (msg.includes("which ego looks highest priority")) {
+        return {
+          text: `The strongest candidates are <strong>EGO 2</strong> for differentiation and <strong>EGO 3</strong> for long-term efficacy, because both connect directly to competitive positioning and evidence closure.`,
+          suggestions: ["strategy", "gap"]
+        };
+      }
+      if (msg.includes("back to executive summary")) {
+        activeNav = "summary";
+        showPage("summary");
+        return {
+          text: `Returning to the executive summary for <strong>${currentAsset}</strong>.`,
+          suggestions: ["summary"]
+        };
+      }
+      if (msg.includes("help me add a new asset")) {
+        return {
+          text: `Use the <strong>Add New Asset</strong> button on the landing screen to upload supporting documents. After submission, the backend workflow will process the asset and create the relevant planning card.`,
+          suggestions: ["summary"]
+        };
+      }
+
+      return {
+        text: `I’ve received your question. For <strong>${currentAsset}</strong>, the most useful next step is usually to review <strong>Gap Identification & Prioritization</strong> or <strong>Competitive Benchmark</strong>.`,
+        suggestions: ["gap", "competitive"]
+      };
+    }
+
+    function handleUserMessage(textOverride = null) {
+      const text = textOverride || chatInput.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      chatInput.value = "";
+
+      const response = generateResponse(text);
+      botReply(response.text, 650, response.suggestions || []);
+    }
+
+    document.getElementById("chatFab").addEventListener("click", openChat);
+    document.getElementById("chatClose").addEventListener("click", closeChat);
+    document.getElementById("chatMinimize").addEventListener("click", closeChat);
+    document.getElementById("chatSend").addEventListener("click", () => handleUserMessage());
+    document.getElementById("chatInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") handleUserMessage();
+    });
+
+    quickReplies.addEventListener("click", (e) => {
+      if (!e.target.classList.contains("quick-reply")) return;
+      handleUserMessage(e.target.textContent.trim());
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeChat();
+        closeModal();
+        closeToast();
+      }
+    });
+
+    // INIT
+    applyLandingFilters();
+    renderEgoCards();
+    renderGapMaps();
+    setAssetName(currentAsset, currentAssetFlowTag);
+    setHeaderMode();
+    updateQuickReplies();
+  </script>
+</body>
+</html>
