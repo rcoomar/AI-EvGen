@@ -4362,29 +4362,37 @@
       return metricMap[assetName] || { si: 3, ego: 5, gap: 10 };
     }
 
-    function flattenPlanRows() {
+    function flattenPlanRows(view = 'all') {
       return assets.map(asset => {
         const refreshItem = asset.indications.find(item => item.statusClass === 'refresh');
         const approvedItem = asset.indications.find(item => item.statusClass === 'approved');
         const processingItem = asset.indications.find(item => item.statusClass === 'backend-processing');
         const activeDraftItem = asset.indications.find(item => item.statusClass === 'active-draft');
-        const primaryItem = refreshItem || approvedItem || processingItem || activeDraftItem || asset.indications[0];
-        const indicationList = asset.indications.map(item => item.name).join(', ');
+        let displayItem;
+        if (view === 'approved') {
+          displayItem = approvedItem || null;
+        } else if (view === 'refresh') {
+          displayItem = refreshItem || null;
+        } else {
+          displayItem = refreshItem || approvedItem || processingItem || activeDraftItem || asset.indications[0] || null;
+        }
         return {
           assetName: asset.name,
-          indications: indicationList,
           ta: asset.ta,
           moa: asset.moa,
-          status: primaryItem.status,
-          statusClass: primaryItem.statusClass,
-          lastUpdated: primaryItem.processingUntil || primaryItem.lastUpdated,
-          linkType: primaryItem.linkType,
-          processing: isProcessing(primaryItem),
+          status: displayItem ? displayItem.status : '',
+          statusClass: displayItem ? displayItem.statusClass : '',
+          lastUpdated: displayItem ? (displayItem.processingUntil || displayItem.lastUpdated) : '',
+          linkType: displayItem ? displayItem.linkType : '',
+          processing: displayItem ? isProcessing(displayItem) : false,
           refreshIndication: refreshItem ? refreshItem.name : (asset.indications[0] ? asset.indications[0].name : ''),
           approvedIndication: approvedItem ? approvedItem.name : (asset.indications[0] ? asset.indications[0].name : ''),
-          metrics: assetStrategicMetrics(asset.name)
+          metrics: assetStrategicMetrics(asset.name),
+          hasApproved: Boolean(approvedItem),
+          hasRefresh: Boolean(refreshItem),
+          displayIndication: displayItem ? displayItem.name : ''
         };
-      });
+      }).filter(row => row.statusClass);
     }
 
     function renderPlansTable(filter = currentPlansFilter, assetFilter = currentPlansAssetFilter) {
@@ -4395,7 +4403,8 @@
       document.querySelectorAll('.plan-filter-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.planView === currentPlansFilter);
       });
-      const rows = flattenPlanRows().filter(row => row.statusClass !== 'active-draft' && (currentPlansFilter === 'all' || row.statusClass === currentPlansFilter) && (!currentPlansAssetFilter || row.assetName === currentPlansAssetFilter));
+      const baseRows = flattenPlanRows(currentPlansFilter);
+      const rows = baseRows.filter(row => row.statusClass !== 'active-draft' && (!currentPlansAssetFilter || row.assetName === currentPlansAssetFilter));
       if (!rows.length) {
         tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#7a737a;font-weight:700;">No plans found for this status.</td></tr>`;
         return;
@@ -4635,7 +4644,13 @@
       btn.addEventListener('click', () => openPlans(btn.dataset.planFilter, null));
     });
     document.querySelectorAll('.plan-filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => renderPlansTable(btn.dataset.planView, currentPlansAssetFilter));
+      btn.addEventListener('click', () => {
+        if (btn.dataset.planView === 'all') {
+          renderPlansTable('all', null);
+        } else {
+          renderPlansTable(btn.dataset.planView, currentPlansAssetFilter);
+        }
+      });
     });
 
     const backToAssetsBtn = document.getElementById("backToAssetsBtn");
