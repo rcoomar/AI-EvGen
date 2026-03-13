@@ -692,6 +692,12 @@
       background: #fffafd;
       color: var(--primary);
     }
+    .review-return-btn {
+      border: 1.4px solid #e7c1e4;
+      background: #fff;
+      color: var(--primary);
+      white-space: nowrap;
+    }
 
     .breadcrumb {
       display: flex;
@@ -2746,6 +2752,18 @@
 
   <!-- PLANS -->
   <section class="page" id="plansScreen">
+    <div class="module-nav">
+      <button class="module-nav-item" data-nav="summary">Executive Summary</button>
+      <button class="module-nav-item" data-nav="gap">Gap Identification & Prioritization</button>
+      <button class="module-nav-item" data-nav="landscape">Disease & Treatment Landscape</button>
+      <button class="module-nav-item" data-nav="competitive">Competitive Benchmark</button>
+      <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
+      <button class="module-nav-item" data-nav="research">Research Documents</button>
+      <button class="module-nav-item active" data-nav="plans">Plans</button>
+      <div class="module-nav-right">
+        <span id="plansLastUpdated">Last Updated: 03/13/2026</span>
+      </div>
+    </div>
     <section class="plans-shell">
       <div class="plans-head">
         <div>
@@ -2796,6 +2814,7 @@
       <button class="module-nav-item" data-nav="competitive">Competitive Benchmark</button>
       <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
       <button class="module-nav-item" data-nav="research">Research Documents</button>
+      <button class="module-nav-item" data-nav="plans">Plans</button>
       <div class="module-nav-right">
         <span class="status-inline" id="summaryStatusInline"></span>
         <span id="summaryLastUpdated">Last Updated: 03/13/2026</span>
@@ -3003,6 +3022,7 @@
       <button class="module-nav-item active" data-nav="competitive">Competitive Benchmark</button>
       <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
       <button class="module-nav-item" data-nav="research">Research Documents</button>
+      <button class="module-nav-item" data-nav="plans">Plans</button>
       <div class="module-nav-right">
         <span class="status-inline" id="competitiveStatusInline"></span>
         <span id="competitiveLastUpdated">Last Updated: 03/13/2026</span>
@@ -3139,6 +3159,7 @@
       <button class="module-nav-item" data-nav="competitive">Competitive Benchmark</button>
       <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
       <button class="module-nav-item" data-nav="research">Research Documents</button>
+      <button class="module-nav-item" data-nav="plans">Plans</button>
       <div class="module-nav-right">
         <span class="status-inline" id="detailStatusInline"></span>
         <span id="detailLastUpdated">Last Updated: 03/13/2026</span>
@@ -3174,6 +3195,7 @@
       <button class="module-nav-item" data-nav="competitive">Competitive Benchmark</button>
       <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
       <button class="module-nav-item" data-nav="research">Research Documents</button>
+      <button class="module-nav-item" data-nav="plans">Plans</button>
       <div class="module-nav-right">
         <span class="status-inline" id="gapStatusInline"></span>
         <span id="gapLastUpdated">Last Updated: 03/13/2026</span>
@@ -3268,6 +3290,7 @@
       <button class="module-nav-item" data-nav="competitive">Competitive Benchmark</button>
       <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
       <button class="module-nav-item" data-nav="research">Research Documents</button>
+      <button class="module-nav-item" data-nav="plans">Plans</button>
       <div class="module-nav-right">
         <span class="status-inline" id="reviewStatusInline"></span>
         <button class="outline-btn" id="backToGapBtn">Back to Gap View</button>
@@ -3342,6 +3365,7 @@
       <button class="module-nav-item" data-nav="competitive">Competitive Benchmark</button>
       <button class="module-nav-item" data-nav="strategy">Asset Strategy</button>
       <button class="module-nav-item active" data-nav="research">Research Documents</button>
+      <button class="module-nav-item" data-nav="plans">Plans</button>
       <div class="module-nav-right">
         <span class="status-inline" id="researchStatusInline"></span>
         <span id="researchLastUpdated">Last Updated: 03/13/2026</span>
@@ -4190,6 +4214,7 @@
       setHeaderMode();
       updateQuickReplies();
       updateNavButtons();
+      injectReviewReturnButtons();
       syncBreadcrumbTags();
       syncRefreshInsightTags();
     }
@@ -4197,6 +4222,24 @@
     function updateNavButtons() {
       document.querySelectorAll(".module-nav-item").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.nav === activeNav);
+      });
+    }
+
+    function injectReviewReturnButtons() {
+      [pages.summary, pages.competitive, pages.detail, pages.research].forEach(page => {
+        if (!page) return;
+        const host = page.querySelector('.module-nav-right');
+        if (!host || host.querySelector('.review-return-btn')) return;
+        const btn = document.createElement('button');
+        btn.className = 'outline-btn review-return-btn';
+        btn.type = 'button';
+        btn.textContent = 'Return to Review Gaps';
+        btn.addEventListener('click', () => {
+          activeNav = 'gap';
+          updateNavButtons();
+          showPage('review');
+        });
+        host.appendChild(btn);
       });
     }
 
@@ -5411,7 +5454,8 @@
         competitive: "Competitive Benchmark",
         landscape: "Disease & Treatment Landscape",
         strategy: "Asset Strategy",
-        research: "Research Documents"
+        research: "Research Documents",
+        plans: "Plans"
       }[key] || key;
     }
 
@@ -5439,6 +5483,9 @@
         activeNav = 'research';
         renderResearchDocs();
         showPage('research');
+      } else if (moduleKey === 'plans') {
+        activeNav = 'plans';
+        openPlans('all', null);
       }
       closeResearchMenus();
       showToast('Opening module', `Taking you to <strong>${moduleLabel(moduleKey)}</strong>.`);
